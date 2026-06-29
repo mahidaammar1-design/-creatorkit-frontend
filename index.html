@@ -213,7 +213,23 @@
     margin-bottom: 22px;
   }
 
-  h1 .accent { color: var(--lime); }
+  h1 .accent {
+    color: var(--lime);
+    position: relative;
+    display: inline-block;
+  }
+
+  h1 .accent::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    bottom: 6px;
+    height: 0.18em;
+    background: rgba(212,255,63,0.25);
+    z-index: -1;
+    border-radius: 2px;
+  }
 
   .hero-sub {
     font-size: 1.1rem;
@@ -282,6 +298,16 @@
     max-width: 300px;
     margin: 0 auto;
     box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5);
+    animation: phoneFloat 6s ease-in-out infinite;
+  }
+
+  @keyframes phoneFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .phone { animation: none; }
   }
 
   .phone-screen {
@@ -439,6 +465,49 @@
     margin-bottom: 20px;
   }
 
+  /* ===== TOOL CATEGORY FILTER ===== */
+  .tool-category-tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+
+  .tool-category-tab {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tool-category-tab:hover {
+    border-color: var(--muted-2);
+    color: var(--text);
+  }
+
+  .tool-category-tab.active {
+    background: var(--lime);
+    border-color: var(--lime);
+    color: #0e0e12;
+    font-weight: 600;
+  }
+
+  .tool-category-tab .count {
+    opacity: 0.65;
+    margin-left: 4px;
+  }
+
+  .tool-card.tool-hidden {
+    display: none;
+  }
+
   .tool-num {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.72rem;
@@ -508,6 +577,7 @@
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 36px;
+    position: relative;
   }
 
   .price-top {
@@ -723,9 +793,18 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    opacity: 0;
+    transition: opacity 0.18s ease;
   }
 
-  .notify-overlay.active { display: flex; }
+  .notify-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .notify-overlay.active .notify-box {
+    animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 
   .notify-box {
     background: var(--surface);
@@ -811,9 +890,23 @@
     justify-content: center;
     padding: 20px;
     overflow-y: auto;
+    opacity: 0;
+    transition: opacity 0.18s ease;
   }
 
-  .modal-overlay.active { display: flex; }
+  .modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  @keyframes modalPopIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-overlay.active .modal-box {
+    animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 
   .modal-box {
     background: var(--surface);
@@ -947,9 +1040,36 @@
     color: var(--muted);
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.82rem;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 
-  .modal-loading.active { display: block; }
+  .modal-loading.active { display: flex; }
+
+  .modal-loading.active::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--lime);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-card {
+    animation: fadeInUp 0.35s ease both;
+  }
 
   .modal-results {
     display: none;
@@ -1469,19 +1589,19 @@
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="eyebrow">19 AI tools · one price · no subscription</div>
-      <h1>Stop wasting<br>time on <span class="accent">blank screens.</span></h1>
-      <p class="hero-sub">
+      <div class="eyebrow" style="animation:fadeInUp 0.5s ease both;">19 AI tools · one price · no subscription</div>
+      <h1 style="animation:fadeInUp 0.5s ease 0.05s both;">Stop wasting<br>time on <span class="accent">blank screens.</span></h1>
+      <p class="hero-sub" style="animation:fadeInUp 0.5s ease 0.1s both;">
         Hooks, scripts, captions, hashtags, replies — what used to take 1 hour, now done in <strong>30 seconds</strong>. Built for creators who actually post.
       </p>
-      <div class="hero-actions">
+      <div class="hero-actions" style="animation:fadeInUp 0.5s ease 0.15s both;">
         <button class="btn-primary" onclick="paywallNotice()">Unlock all 19 tools — $5</button>
         <button class="btn-ghost" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See how it works</button>
       </div>
       <div class="hero-note">// one-time payment · no subscription · no expiry</div>
 
       <!-- Social Proof Bar -->
-      <div style="display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:14px;margin-top:24px;flex-wrap:wrap;animation:fadeInUp 0.5s ease 0.1s both;">
         <div style="display:flex;">
           <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4ff3f,#8ab000);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:#0e0e12;margin-right:-8px;z-index:4;">P</div>
           <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ff5a5f,#cc3030);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:white;margin-right:-8px;z-index:3;">A</div>
@@ -1611,9 +1731,15 @@
       <p>No dashboard to learn, no form to fill. Open a tool, type one line, get results. That simple.</p>
     </div>
 
+    <div class="tool-category-tabs" id="toolCategoryTabs">
+      <button class="tool-category-tab active" data-category="all" onclick="filterTools('all', this)">All tools <span class="count">19</span></button>
+      <button class="tool-category-tab" data-category="content" onclick="filterTools('content', this)">Content creation <span class="count">14</span></button>
+      <button class="tool-category-tab" data-category="career" onclick="filterTools('career', this)">Career & branding <span class="count">5</span></button>
+    </div>
+
     <div class="tool-grid">
 
-      <div class="tool-card" onclick="openHookModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openHookModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">01</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1623,7 +1749,7 @@
         <div class="tool-preview">"nobody told me this before I turned 20..." <b>— curiosity hook</b></div>
       </div>
 
-      <div class="tool-card" onclick="openScriptModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openScriptModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">02</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1633,7 +1759,7 @@
         <div class="tool-preview">0:00 hook · 0:05 setup · 0:20 payoff <b>· 0:45 CTA</b></div>
       </div>
 
-      <div class="tool-card" onclick="openCaptionModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openCaptionModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">03</span>
           <span class="tool-badge" style="background:rgba(212,255,63,0.15);color:var(--lime);border:1px solid rgba(212,255,63,0.3);">✦ free demo</span>
@@ -1643,7 +1769,7 @@
         <div class="tool-preview">"golden hour, no plans, no problems" <b>— soft tone</b></div>
       </div>
 
-      <div class="tool-card" onclick="openCommentModal()" style="cursor:pointer;">
+      <div class="tool-card" data-category="content" onclick="openCommentModal()" style="cursor:pointer;">
         <div class="tool-card-top">
           <span class="tool-num">04</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1653,7 +1779,7 @@
         <div class="tool-preview">"ratio" → <b>"Crying in 15k followers 💀"</b></div>
       </div>
 
-      <div class="tool-card" onclick="openThumbnailModal()" style="cursor:pointer;">
+      <div class="tool-card" data-category="content" onclick="openThumbnailModal()" style="cursor:pointer;">
         <div class="tool-card-top">
           <span class="tool-num">05</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1663,7 +1789,7 @@
         <div class="tool-preview"><b>I TRIED THIS FOR 30 DAYS</b> — high CTR</div>
       </div>
 
-      <div class="tool-card" onclick="openHashtagModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openHashtagModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">06</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1673,7 +1799,7 @@
         <div class="tool-preview">#cafehopping #aestheticcorner <b>+ 18 more</b></div>
       </div>
 
-      <div class="tool-card" onclick="openCalendarModal()" style="cursor:pointer;">
+      <div class="tool-card" data-category="content" onclick="openCalendarModal()" style="cursor:pointer;">
         <div class="tool-card-top">
           <span class="tool-num">07</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1683,7 +1809,7 @@
         <div class="tool-preview">Day 1: BTS reel · Day 2: Tutorial <b>· Day 3: Trend</b></div>
       </div>
 
-      <div class="tool-card" onclick="openYtDescModal()" style="cursor:pointer;">
+      <div class="tool-card" data-category="content" onclick="openYtDescModal()" style="cursor:pointer;">
         <div class="tool-card-top">
           <span class="tool-num">08</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1693,7 +1819,7 @@
         <div class="tool-preview">#youtubegrowth #creatorlife <b>+ full desc</b></div>
       </div>
 
-      <div class="tool-card" onclick="openCollabModal()" style="cursor:pointer;">
+      <div class="tool-card" data-category="content" onclick="openCollabModal()" style="cursor:pointer;">
         <div class="tool-card-top">
           <span class="tool-num">09</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1703,7 +1829,7 @@
         <div class="tool-preview">"Hey [Brand], I create for 18-24 who..." <b>→ full DM</b></div>
       </div>
 
-      <div class="tool-card" onclick="openBioModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="career" onclick="openBioModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">10</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1713,7 +1839,7 @@
         <div class="tool-preview">"23 · making food less boring 🍳" <b>vs your old bio</b></div>
       </div>
 
-      <div class="tool-card" onclick="openResumeModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="career" onclick="openResumeModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">11</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1723,7 +1849,7 @@
         <div class="tool-preview">"ran a small Instagram page" → <b>"Grew Instagram following 40% in 6 months through content strategy"</b></div>
       </div>
 
-      <div class="tool-card" onclick="openTweetModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openTweetModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">12</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1733,7 +1859,7 @@
         <div class="tool-preview">"working from home" → <b>"day 47 of pretending my camera is on"</b></div>
       </div>
 
-      <div class="tool-card" onclick="openAboutMeModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="career" onclick="openAboutMeModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">13</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1743,7 +1869,7 @@
         <div class="tool-preview">"freelance editor, 3 years" → <b>full About section, written for you</b></div>
       </div>
 
-      <div class="tool-card" onclick="openBrandStatementModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="career" onclick="openBrandStatementModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">14</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1753,7 +1879,7 @@
         <div class="tool-preview">"I edit videos for small businesses" → <b>"I help small businesses turn raw footage into scroll-stopping content."</b></div>
       </div>
 
-      <div class="tool-card" onclick="openColdEmailModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="career" onclick="openColdEmailModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">15</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1763,7 +1889,7 @@
         <div class="tool-preview">"applying for social media role" → <b>full outreach message, ready to send</b></div>
       </div>
 
-      <div class="tool-card" onclick="openRepurposeModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openRepurposeModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">16</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1773,7 +1899,7 @@
         <div class="tool-preview">"how I built my first $1k month" → <b>3 formats, 1 click</b></div>
       </div>
 
-      <div class="tool-card" onclick="openPollIdeasModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openPollIdeasModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">17</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1783,7 +1909,7 @@
         <div class="tool-preview">"fitness niche" → <b>"Cardio or lifting — pick one, no in-between 👀"</b></div>
       </div>
 
-      <div class="tool-card" onclick="openNewsletterModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openNewsletterModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">18</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1793,7 +1919,7 @@
         <div class="tool-preview">"this week's marketing trends" → <b>hook-y opening paragraph, ready to paste</b></div>
       </div>
 
-      <div class="tool-card" onclick="openCrisisResponseModal()" style="cursor: pointer;">
+      <div class="tool-card" data-category="content" onclick="openCrisisResponseModal()" style="cursor: pointer;">
         <div class="tool-card-top">
           <span class="tool-num">19</span>
           <span class="tool-badge lock-badge">🔒 paid</span>
@@ -1811,6 +1937,7 @@
   <div class="section" style="padding-top:90px;padding-bottom:90px;">
     <div class="wrap price-grid">
       <div class="price-card">
+        <div class="price-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--lime);color:#0e0e12;font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;padding:5px 16px;border-radius:100px;text-transform:uppercase;white-space:nowrap;">Pay once, never again</div>
         <div class="price-top">
           <span class="price-amount">$5</span>
           <span class="price-period">one time</span>
@@ -1822,14 +1949,26 @@
           <li><span class="check">✓</span> New tools added monthly at no extra cost</li>
           <li><span class="check">✓</span> Access from any device with your login</li>
           <li><span class="check">✓</span> Works on any phone — no app needed</li>
-          <li><span class="check">✓</span> Hook · Script · Caption · Hashtag · Thumbnail · Replies · Calendar · YouTube · Pitch · Bio</li>
+          <li><span class="check">✓</span> Content tools + career tools (resume, brand, outreach)</li>
         </ul>
         <button class="price-cta" onclick="paywallNotice()">Unlock CreatorKit — $5</button>
+        <div style="text-align:center;font-size:0.76rem;color:var(--muted-2);margin-top:12px;font-family:'JetBrains Mono',monospace;">that's less than ₹0.20/day over a year</div>
       </div>
 
       <div class="price-side">
         <h3>Less than one coffee.<br>Used every single day.</h3>
         <p>Other apps charge ₹500/month forever. CreatorKit is a one-time payment — 19 tools, no expiry, new tools added free. Open it whenever you need it.</p>
+
+        <div style="margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:0.85rem;color:var(--muted);">Typical AI subscription</span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);text-decoration:line-through;">₹500-1500/mo</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+            <span style="font-size:0.85rem;color:var(--text);font-weight:600;">CreatorKit, forever</span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--lime);">$5 once</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -4416,6 +4555,21 @@
       icon.textContent = '×';
       icon.style.transform = 'rotate(0deg)';
     }
+  }
+
+  // Filters the tool grid by category without reloading or losing scroll position
+  function filterTools(category, btn) {
+    document.querySelectorAll('.tool-category-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.tool-card').forEach(card => {
+      const cardCategory = card.dataset.category;
+      if (category === 'all' || cardCategory === category) {
+        card.classList.remove('tool-hidden');
+      } else {
+        card.classList.add('tool-hidden');
+      }
+    });
   }
 
 
