@@ -148,6 +148,10 @@
       flex-shrink: 0;
     }
 
+    .hero {
+      padding: 28px 0 40px;
+    }
+
     .logo { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   }
 
@@ -251,9 +255,13 @@
     border: none;
     cursor: pointer;
     font-family: inherit;
-    transition: transform 0.15s;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
   }
-  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px -10px rgba(212,255,63,0.45);
+  }
+  .btn-primary:active { transform: translateY(0) scale(0.98); }
 
   .btn-ghost {
     background: transparent;
@@ -447,15 +455,20 @@
     border: 1px solid var(--border);
     border-radius: 18px;
     padding: 26px;
-    transition: border-color 0.2s, transform 0.2s;
+    transition: border-color 0.25s, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
     cursor: default;
     display: flex;
     flex-direction: column;
   }
 
   .tool-card:hover {
-    border-color: var(--muted-2);
-    transform: translateY(-3px);
+    border-color: var(--lime);
+    transform: translateY(-5px);
+    box-shadow: 0 16px 32px -16px rgba(212,255,63,0.18);
+  }
+
+  .tool-card:active {
+    transform: translateY(-2px) scale(0.99);
   }
 
   .tool-card-top {
@@ -924,6 +937,94 @@
     .modal-box { padding: 24px 20px; border-radius: 18px; }
   }
 
+  .modal-box.wide { max-width: 660px; }
+
+  .util-select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    padding: 13px 14px;
+    outline: none;
+  }
+
+  .util-file-drop {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 22px 14px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .util-file-drop:hover { border-color: var(--lime); color: var(--text); }
+
+  .util-slider-row { display: flex; align-items: center; gap: 12px; }
+
+  .util-slider-row input[type="range"] { flex: 1; accent-color: var(--lime); }
+
+  .util-slider-row .val { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); min-width: 42px; text-align: right; }
+
+  .util-swatch-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .util-swatch {
+    width: 34px; height: 34px; border-radius: 9px; cursor: pointer;
+    border: 2px solid var(--border); flex-shrink: 0;
+  }
+
+  .util-swatch.selected { border-color: var(--lime); box-shadow: 0 0 0 2px rgba(212,255,63,0.25); }
+
+  .invoice-row-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 90px 90px 30px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .invoice-row-grid { grid-template-columns: 1fr 1fr; grid-template-areas: "desc desc" "qty rate" "total del"; }
+  }
+
+  .invoice-row-grid input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    padding: 8px 9px;
+    outline: none;
+    width: 100%;
+  }
+
+  .invoice-row-del {
+    background: none; border: none; color: var(--muted-2); cursor: pointer; font-size: 1.05rem;
+  }
+  .invoice-row-del:hover { color: var(--coral); }
+
+  .util-download-btn {
+    width: 100%;
+    background: var(--surface-2);
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 13px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 10px;
+  }
+  .util-download-btn:hover { border-color: var(--lime); color: var(--lime); }
+
   .modal-close {
     position: absolute;
     top: 18px;
@@ -1026,6 +1127,15 @@
     cursor: pointer;
     font-family: inherit;
     margin-top: 4px;
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s;
+  }
+
+  .generate-btn:hover:not(:disabled) {
+    box-shadow: 0 8px 20px -10px rgba(212,255,63,0.45);
+  }
+
+  .generate-btn:active:not(:disabled) {
+    transform: scale(0.98);
   }
 
   .generate-btn:disabled {
@@ -1727,14 +1837,15 @@
   <div class="wrap">
     <div class="section-head">
       <div class="section-eyebrow">// the toolkit</div>
-      <h2>Nineteen tools. Every content task covered.</h2>
+      <h2>Twenty-five tools. Every content task covered.</h2>
       <p>No dashboard to learn, no form to fill. Open a tool, type one line, get results. That simple.</p>
     </div>
 
     <div class="tool-category-tabs" id="toolCategoryTabs">
-      <button class="tool-category-tab active" data-category="all" onclick="filterTools('all', this)">All tools <span class="count">19</span></button>
-      <button class="tool-category-tab" data-category="content" onclick="filterTools('content', this)">Content creation <span class="count">14</span></button>
+      <button class="tool-category-tab active" data-category="all" onclick="filterTools('all', this)">All tools <span class="count">25</span></button>
+      <button class="tool-category-tab" data-category="content" onclick="filterTools('content', this)">Content creation <span class="count">15</span></button>
       <button class="tool-category-tab" data-category="career" onclick="filterTools('career', this)">Career & branding <span class="count">5</span></button>
+      <button class="tool-category-tab" data-category="free" onclick="filterTools('free', this)">Free utilities <span class="count">5</span></button>
     </div>
 
     <div class="tool-grid">
@@ -1929,6 +2040,56 @@
         <div class="tool-preview">"comment backlash on a post" → <b>calm, accountable response draft</b></div>
       </div>
 
+      <div class="tool-card" data-category="content" onclick="openEmailWriterModal()" style="cursor: pointer;">
+        <div class="tool-card-top">
+          <span class="tool-num">20</span>
+          <span class="tool-badge lock-badge">🔒 paid</span>
+        </div>
+        <div class="tool-title">AI email writer</div>
+        <div class="tool-desc">Describe who it's for and why — get a ready-to-send outreach, follow-up, or business email in seconds.</div>
+        <div class="tool-preview">"pitch a brand for sponsorship" → <b>full email, subject line included</b></div>
+      </div>
+
+      <div class="tool-card" data-category="free" onclick="openQrModal()" style="cursor: pointer;">
+        <div class="tool-card-top">
+          <span class="tool-num">21</span>
+          <span class="tool-badge" style="background:rgba(212,255,63,0.15);color:var(--lime);border:1px solid rgba(212,255,63,0.3);">✦ free</span>
+        </div>
+        <div class="tool-title">QR code generator</div>
+        <div class="tool-desc">Turn any link, text, or contact into a scannable QR code. Pick colors, download instantly in HD.</div>
+        <div class="tool-preview">yourlink.com → <b>scan-ready QR, zero cost</b></div>
+      </div>
+
+      <div class="tool-card" data-category="free" onclick="openInvoiceModal()" style="cursor: pointer;">
+        <div class="tool-card-top">
+          <span class="tool-num">22</span>
+          <span class="tool-badge" style="background:rgba(212,255,63,0.15);color:var(--lime);border:1px solid rgba(212,255,63,0.3);">✦ free</span>
+        </div>
+        <div class="tool-title">Invoice generator</div>
+        <div class="tool-desc">Freelancer or small creator business? Build a clean invoice with line items and totals, then download as PDF.</div>
+        <div class="tool-preview">Add items, auto-total <b>→ download PDF</b></div>
+      </div>
+
+      <div class="tool-card" data-category="free" onclick="openScreenshotModal()" style="cursor: pointer;">
+        <div class="tool-card-top">
+          <span class="tool-num">23</span>
+          <span class="tool-badge" style="background:rgba(212,255,63,0.15);color:var(--lime);border:1px solid rgba(212,255,63,0.3);">✦ free</span>
+        </div>
+        <div class="tool-title">Screenshot beautifier</div>
+        <div class="tool-desc">Drop in a plain screenshot — get it framed with a padded gradient background, ready for social media.</div>
+        <div class="tool-preview">plain screenshot → <b>social-ready framed image</b></div>
+      </div>
+
+      <div class="tool-card" data-category="free" onclick="openImageToolModal()" style="cursor: pointer;">
+        <div class="tool-card-top">
+          <span class="tool-num">24</span>
+          <span class="tool-badge" style="background:rgba(212,255,63,0.15);color:var(--lime);border:1px solid rgba(212,255,63,0.3);">✦ free</span>
+        </div>
+        <div class="tool-title">Image compressor & converter</div>
+        <div class="tool-desc">Shrink image file size or convert between JPG, PNG, and WebP — all in your browser, nothing uploaded anywhere.</div>
+        <div class="tool-preview">4.2MB PNG → <b>380KB WebP, same quality</b></div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1952,17 +2113,17 @@
           <li><span class="check">✓</span> Content tools + career tools (resume, brand, outreach)</li>
         </ul>
         <button class="price-cta" onclick="paywallNotice()">Unlock CreatorKit — $5</button>
-        <div style="text-align:center;font-size:0.76rem;color:var(--muted-2);margin-top:12px;font-family:'JetBrains Mono',monospace;">that's less than ₹0.20/day over a year</div>
+        <div style="text-align:center;font-size:0.76rem;color:var(--muted-2);margin-top:12px;font-family:'JetBrains Mono',monospace;">that's less than $0.02/day over a year</div>
       </div>
 
       <div class="price-side">
         <h3>Less than one coffee.<br>Used every single day.</h3>
-        <p>Other apps charge ₹500/month forever. CreatorKit is a one-time payment — 19 tools, no expiry, new tools added free. Open it whenever you need it.</p>
+        <p>Other apps charge $6/month forever. CreatorKit is a one-time payment — 19 tools, no expiry, new tools added free. Open it whenever you need it.</p>
 
         <div style="margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
             <span style="font-size:0.85rem;color:var(--muted);">Typical AI subscription</span>
-            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);text-decoration:line-through;">₹500-1500/mo</span>
+            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);text-decoration:line-through;">$6-15/mo</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
             <span style="font-size:0.85rem;color:var(--text);font-weight:600;">CreatorKit, forever</span>
@@ -2058,7 +2219,7 @@
           <span class="faq-icon" style="font-size:1.1rem;color:var(--muted);flex-shrink:0;transition:transform 0.2s;">+</span>
         </button>
         <div class="faq-body" style="display:none;padding-bottom:18px;font-size:0.9rem;color:var(--muted);line-height:1.7;">
-          Yes, 100%. Pay $5 once and you get lifetime access — no monthly charges, no renewals, no expiry. Other tools charge ₹500+/month forever. We don't.
+          Yes, 100%. Pay $5 once and you get lifetime access — no monthly charges, no renewals, no expiry. Other tools charge $6+/month forever. We don't.
         </div>
       </div>
 
@@ -2579,6 +2740,214 @@
   </div>
 </div>
 
+<!-- AI EMAIL WRITER MODAL -->
+<div class="modal-overlay" id="emailWriterModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('emailWriterModal')">✕</button>
+    <div class="modal-header">
+      <div class="modal-eyebrow">ai email writer</div>
+      <h3>What's the email for?</h3>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Purpose</label>
+      <div class="tone-grid" id="emailPurposeGrid">
+        <button class="tone-btn selected" data-emailpurpose="outreach">Outreach</button>
+        <button class="tone-btn" data-emailpurpose="followup">Follow-up</button>
+        <button class="tone-btn" data-emailpurpose="thankyou">Thank you</button>
+        <button class="tone-btn" data-emailpurpose="intro">Introduction</button>
+        <button class="tone-btn" data-emailpurpose="request">Request</button>
+        <button class="tone-btn" data-emailpurpose="decline">Polite decline</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Who is it to, and what's the context?</label>
+      <textarea class="topic-input" id="emailContext" rows="3" placeholder="e.g. emailing a brand to pitch a paid collab for my food page, 40k followers" style="resize:none;font-family:'Inter',sans-serif;"></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Tone</label>
+      <div class="tone-grid" id="emailToneGrid">
+        <button class="tone-btn selected" data-emailtone="professional">Professional</button>
+        <button class="tone-btn" data-emailtone="friendly">Friendly</button>
+        <button class="tone-btn" data-emailtone="direct">Direct</button>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="emailWriterBtn" onclick="generateEmailWriter()">Write my email</button>
+
+    <div class="modal-loading" id="emailWriterLoading">Writing your email...</div>
+
+    <div class="modal-results" id="emailWriterResults"></div>
+  </div>
+</div>
+
+<!-- QR CODE GENERATOR MODAL -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('qrModal')">✕</button>
+    <div class="modal-header">
+      <div class="modal-eyebrow">qr code generator · free</div>
+      <h3>What should it link to?</h3>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Link, text, email, or phone number</label>
+      <input type="text" class="topic-input" id="qrData" placeholder="e.g. https://instagram.com/yourname" />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">QR color</label>
+      <div class="util-swatch-row" id="qrColorRow">
+        <div class="util-swatch selected" style="background:#0e0e12;" data-qrcolor="0e0e12"></div>
+        <div class="util-swatch" style="background:#ff5a5f;" data-qrcolor="ff5a5f"></div>
+        <div class="util-swatch" style="background:#3f6cff;" data-qrcolor="3f6cff"></div>
+        <div class="util-swatch" style="background:#7a5cff;" data-qrcolor="7a5cff"></div>
+        <div class="util-swatch" style="background:#00a86b;" data-qrcolor="00a86b"></div>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="qrBtn" onclick="generateQr()">Generate QR code</button>
+
+    <div class="modal-loading" id="qrLoading">Generating...</div>
+
+    <div class="modal-results" id="qrResults" style="text-align:center;"></div>
+  </div>
+</div>
+
+<!-- INVOICE GENERATOR MODAL -->
+<div class="modal-overlay" id="invoiceModal">
+  <div class="modal-box wide">
+    <button class="modal-close" onclick="closeModal('invoiceModal')">✕</button>
+    <div class="modal-header">
+      <div class="modal-eyebrow">invoice generator · free</div>
+      <h3>Build your invoice</h3>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="field-group">
+        <label class="field-label">From (your name / business)</label>
+        <input type="text" class="topic-input" id="invFrom" placeholder="Your Name / Studio" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Bill to</label>
+        <input type="text" class="topic-input" id="invTo" placeholder="Client Name" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Invoice #</label>
+        <input type="text" class="topic-input" id="invNumber" placeholder="INV-001" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input type="date" class="topic-input" id="invDate" />
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Items</label>
+      <div id="invoiceRows"></div>
+      <button class="util-download-btn" style="margin-top:0;" onclick="addInvoiceRow()">+ Add item</button>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Notes (optional)</label>
+      <input type="text" class="topic-input" id="invNotes" placeholder="e.g. Payment due within 7 days · UPI: yourname@bank" />
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--border);margin-top:6px;">
+      <span style="color:var(--muted);font-size:0.88rem;">Total</span>
+      <span id="invTotal" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.3rem;">$0.00</span>
+    </div>
+
+    <button class="generate-btn" id="invoiceBtn" onclick="downloadInvoice()">Download invoice (PDF)</button>
+  </div>
+</div>
+
+<!-- SCREENSHOT BEAUTIFIER MODAL -->
+<div class="modal-overlay" id="screenshotModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('screenshotModal')">✕</button>
+    <div class="modal-header">
+      <div class="modal-eyebrow">screenshot beautifier · free</div>
+      <h3>Upload your screenshot</h3>
+    </div>
+
+    <div class="field-group">
+      <label class="util-file-drop" id="ssDropLabel" for="ssFileInput">Click to upload an image (PNG/JPG)</label>
+      <input type="file" id="ssFileInput" accept="image/*" style="display:none;" onchange="handleScreenshotUpload(event)" />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Background</label>
+      <div class="util-swatch-row" id="ssBgRow">
+        <div class="util-swatch selected" style="background:linear-gradient(135deg,#667eea,#764ba2);" data-ssbg="linear-gradient(135deg,#667eea,#764ba2)"></div>
+        <div class="util-swatch" style="background:linear-gradient(135deg,#f093fb,#f5576c);" data-ssbg="linear-gradient(135deg,#f093fb,#f5576c)"></div>
+        <div class="util-swatch" style="background:linear-gradient(135deg,#4facfe,#00f2fe);" data-ssbg="linear-gradient(135deg,#4facfe,#00f2fe)"></div>
+        <div class="util-swatch" style="background:linear-gradient(135deg,#fa709a,#fee140);" data-ssbg="linear-gradient(135deg,#fa709a,#fee140)"></div>
+        <div class="util-swatch" style="background:#0e0e12;" data-ssbg="#0e0e12"></div>
+        <div class="util-swatch" style="background:#f2f2f0;" data-ssbg="#f2f2f0"></div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Padding <span class="val" id="ssPaddingVal" style="font-family:'JetBrains Mono',monospace;color:var(--muted);"></span></label>
+      <div class="util-slider-row">
+        <input type="range" id="ssPadding" min="20" max="140" value="70" oninput="updateSsPreview()" />
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Corner radius <span class="val" id="ssRadiusVal" style="font-family:'JetBrains Mono',monospace;color:var(--muted);"></span></label>
+      <div class="util-slider-row">
+        <input type="range" id="ssRadius" min="0" max="40" value="16" oninput="updateSsPreview()" />
+      </div>
+    </div>
+
+    <canvas id="ssCanvas" style="width:100%;border-radius:12px;margin:14px 0;display:none;"></canvas>
+
+    <button class="util-download-btn" id="ssDownloadBtn" style="display:none;" onclick="downloadScreenshot()">Download image</button>
+  </div>
+</div>
+
+<!-- IMAGE COMPRESSOR / CONVERTER MODAL -->
+<div class="modal-overlay" id="imageToolModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('imageToolModal')">✕</button>
+    <div class="modal-header">
+      <div class="modal-eyebrow">image compressor & converter · free</div>
+      <h3>Upload an image</h3>
+    </div>
+
+    <div class="field-group">
+      <label class="util-file-drop" id="imgDropLabel" for="imgFileInput">Click to upload an image</label>
+      <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="handleImageToolUpload(event)" />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Convert to</label>
+      <select class="util-select" id="imgFormat" onchange="updateImgPreview()">
+        <option value="image/jpeg">JPG</option>
+        <option value="image/webp">WebP (smallest)</option>
+        <option value="image/png">PNG</option>
+      </select>
+    </div>
+
+    <div class="field-group" id="imgQualityGroup">
+      <label class="field-label">Quality <span class="val" id="imgQualityVal" style="font-family:'JetBrains Mono',monospace;color:var(--muted);"></span></label>
+      <div class="util-slider-row">
+        <input type="range" id="imgQuality" min="10" max="100" value="80" oninput="updateImgPreview()" />
+      </div>
+    </div>
+
+    <div id="imgSizeCompare" style="display:none;font-size:0.82rem;color:var(--muted);margin-bottom:10px;font-family:'JetBrains Mono',monospace;"></div>
+
+    <canvas id="imgCanvas" style="display:none;"></canvas>
+
+    <button class="util-download-btn" id="imgDownloadBtn" style="display:none;" onclick="downloadImageTool()">Download image</button>
+  </div>
+</div>
+
 <!-- CONTENT CALENDAR MODAL -->
 <div class="modal-overlay" id="calendarModal">
   <div class="modal-box">
@@ -2839,7 +3208,7 @@
       <!-- Shown only when NOT paid -->
       <div class="profile-unlock-banner" id="profileUnlockBanner">
         <div class="title">⚡ Unlock all 19 tools</div>
-        <div class="sub">One-time payment of $5 (₹420). No subscription, access forever from any device.</div>
+        <div class="sub">One-time payment of $5. No subscription, access forever from any device.</div>
         <button class="generate-btn" onclick="closeProfileModal(); paywallNotice();">Unlock now — $5</button>
       </div>
 
@@ -2962,7 +3331,7 @@
       <div style="width:40px;height:40px;background:rgba(212,255,63,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">⚡</div>
       <div>
         <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:-0.3px;">Unlock CreatorKit</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--lime);" id="payPriceLine">one-time · $5 (₹420) · forever</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--lime);" id="payPriceLine">one-time · $5 · forever</div>
       </div>
     </div>
 
@@ -3353,6 +3722,8 @@
   let selectedThumbStyle = 'shocking';
   let selectedTweetTone = 'witty and funny';
   let selectedAboutMeTone = 'warm and personal';
+  let selectedEmailPurpose = 'outreach';
+  let selectedEmailTone = 'professional';
   let pendingAuthIntent = null;
 
   // Dark / Light Mode Toggle
@@ -3690,7 +4061,7 @@
     const payBtn = document.getElementById('payConfirmBtn');
 
     // Reset to base price first, in case the fetch below fails or is slow
-    priceLine.textContent = 'one-time · $5 (₹420) · forever';
+    priceLine.textContent = 'one-time · $5 · forever';
     banner.style.display = 'none';
     payBtn.textContent = 'Pay $5 — Unlock now';
 
@@ -3705,8 +4076,7 @@
 
       if (data.success && data.discountPercent > 0) {
         const discountedUsd = (5 * (1 - data.discountPercent / 100)).toFixed(2);
-        const discountedInr = Math.round(420 * (1 - data.discountPercent / 100));
-        priceLine.innerHTML = '<span style="text-decoration:line-through;color:var(--muted-2);">$5</span> $' + discountedUsd + ' (₹' + discountedInr + ') · forever';
+        priceLine.innerHTML = '<span style="text-decoration:line-through;color:var(--muted-2);">$5</span> $' + discountedUsd + ' · forever';
         banner.style.display = 'block';
         bannerText.textContent = data.referralCount + ' referral' + (data.referralCount > 1 ? 's' : '') + ' applied — ' + data.discountPercent + '% off!';
         payBtn.textContent = 'Pay $' + discountedUsd + ' — Unlock now';
@@ -4270,9 +4640,9 @@
     }
   }
 
-  // Tone selection — scoped per modal, so caption tones and hook styles don't clash
-  document.querySelectorAll('.modal-box').forEach(box => {
-    const toneBtns = box.querySelectorAll('.tone-btn');
+  // Tone selection — scoped per tone-grid, so groups within the same modal (or different modals) don't clash
+  document.querySelectorAll('.tone-grid').forEach(grid => {
+    const toneBtns = grid.querySelectorAll('.tone-btn');
     toneBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         toneBtns.forEach(b => b.classList.remove('selected'));
@@ -4285,6 +4655,8 @@
         if (btn.dataset.thumbstyle) selectedThumbStyle = btn.dataset.thumbstyle;
         if (btn.dataset.tweettone) selectedTweetTone = btn.dataset.tweettone;
         if (btn.dataset.aboutmetone) selectedAboutMeTone = btn.dataset.aboutmetone;
+        if (btn.dataset.emailpurpose) selectedEmailPurpose = btn.dataset.emailpurpose;
+        if (btn.dataset.emailtone) selectedEmailTone = btn.dataset.emailtone;
       });
     });
   });
@@ -4852,6 +5224,319 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       inputSummary: situation,
       prompt: `You are a communications advisor who helps people respond to online backlash calmly and sincerely. Situation: "${situation}". Write a short public response (3-5 sentences) that: acknowledges the concern without being defensive, takes appropriate accountability without over-apologizing or sounding fake, and states what they'll do differently if relevant. No markdown, no corporate legal-sounding language. Return ONLY the response text.`
     });
+  }
+
+  // ===== AI EMAIL WRITER =====
+  function openEmailWriterModal() {
+    if (!isUnlocked()) { paywallNotice(); return; }
+    document.getElementById('emailWriterModal').classList.add('active');
+    document.getElementById('emailWriterResults').classList.remove('active');
+    document.getElementById('emailWriterResults').innerHTML = '';
+  }
+
+  function generateEmailWriter() {
+    const context = document.getElementById('emailContext').value.trim();
+    if (!context) {
+      showNotify('Please describe who it\'s for and the context.', 'error');
+      return;
+    }
+    const purposeLabel = { outreach: 'cold outreach', followup: 'a follow-up', thankyou: 'a thank you', intro: 'an introduction', request: 'a request', decline: 'a polite decline' }[selectedEmailPurpose] || 'outreach';
+    runTool({
+      btnId: 'emailWriterBtn', loadingId: 'emailWriterLoading', resultsId: 'emailWriterResults',
+      maxTokens: 500,
+      parseMode: 'block',
+      toolName: 'AI email writer',
+      inputSummary: context,
+      prompt: `You are an expert email copywriter. Write ${purposeLabel} email. Context: "${context}". Tone: ${selectedEmailTone}. Write it as plain text with "SUBJECT:" on the first line followed by a short subject line, then a blank line, then the email body (no placeholders like [Your Name] left generic — infer reasonable details from context, keep it concise, no markdown, no asterisks). Return ONLY the subject line and email body in that format.`
+    });
+  }
+
+  // ===== QR CODE GENERATOR (free, client-side, no AI needed) =====
+  let selectedQrColor = '0e0e12';
+  document.addEventListener('DOMContentLoaded', () => {
+    const qrRow = document.getElementById('qrColorRow');
+    if (qrRow) {
+      qrRow.querySelectorAll('.util-swatch').forEach(sw => {
+        sw.addEventListener('click', () => {
+          qrRow.querySelectorAll('.util-swatch').forEach(s => s.classList.remove('selected'));
+          sw.classList.add('selected');
+          selectedQrColor = sw.dataset.qrcolor;
+        });
+      });
+    }
+  });
+
+  function openQrModal() {
+    document.getElementById('qrModal').classList.add('active');
+    document.getElementById('qrResults').classList.remove('active');
+    document.getElementById('qrResults').innerHTML = '';
+  }
+
+  function generateQr() {
+    const data = document.getElementById('qrData').value.trim();
+    if (!data) { showNotify('Please enter a link or text to encode.', 'error'); return; }
+    const results = document.getElementById('qrResults');
+    const encoded = encodeURIComponent(data);
+    const src = `https://api.qrserver.com/v1/create-qr-code/?size=440x440&data=${encoded}&color=${selectedQrColor}&bgcolor=ffffff&margin=14`;
+    results.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+        <img id="qrImg" src="${src}" alt="QR code" style="width:220px;height:220px;border-radius:12px;background:#fff;padding:10px;" crossorigin="anonymous" />
+        <button class="util-download-btn" onclick="downloadQr('${src.replace(/'/g,"\\'")}')">Download QR code</button>
+      </div>`;
+    results.classList.add('active');
+    saveToHistory('QR code generator', data, data);
+  }
+
+  async function downloadQr(src) {
+    try {
+      const resp = await fetch(src);
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'qr-code.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      window.open(src, '_blank');
+    }
+  }
+
+  // ===== INVOICE GENERATOR (free, client-side) =====
+  let invoiceRowCount = 0;
+  function openInvoiceModal() {
+    document.getElementById('invoiceModal').classList.add('active');
+    if (!document.getElementById('invDate').value) {
+      document.getElementById('invDate').value = new Date().toISOString().slice(0, 10);
+    }
+    if (invoiceRowCount === 0) {
+      addInvoiceRow(); addInvoiceRow();
+    }
+  }
+
+  function addInvoiceRow() {
+    invoiceRowCount++;
+    const id = invoiceRowCount;
+    const row = document.createElement('div');
+    row.className = 'invoice-row-grid';
+    row.id = `invRow${id}`;
+    row.innerHTML = `
+      <input type="text" placeholder="Description" oninput="updateInvoiceTotal()" style="grid-area:desc;" />
+      <input type="number" placeholder="Qty" value="1" min="0" oninput="updateInvoiceTotal()" style="grid-area:qty;" />
+      <input type="number" placeholder="Rate" value="0" min="0" step="0.01" oninput="updateInvoiceTotal()" style="grid-area:rate;" />
+      <input type="text" disabled placeholder="$0.00" class="invRowTotal" style="grid-area:total;opacity:0.7;" />
+      <button class="invoice-row-del" onclick="removeInvoiceRow(${id})" style="grid-area:del;">✕</button>
+    `;
+    document.getElementById('invoiceRows').appendChild(row);
+    updateInvoiceTotal();
+  }
+
+  function removeInvoiceRow(id) {
+    const row = document.getElementById(`invRow${id}`);
+    if (row) row.remove();
+    updateInvoiceTotal();
+  }
+
+  function updateInvoiceTotal() {
+    let total = 0;
+    document.querySelectorAll('#invoiceRows .invoice-row-grid').forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      const qty = parseFloat(inputs[1].value) || 0;
+      const rate = parseFloat(inputs[2].value) || 0;
+      const rowTotal = qty * rate;
+      inputs[3].value = `$${rowTotal.toFixed(2)}`;
+      total += rowTotal;
+    });
+    document.getElementById('invTotal').textContent = `$${total.toFixed(2)}`;
+    return total;
+  }
+
+  function downloadInvoice() {
+    const from = document.getElementById('invFrom').value.trim() || 'Your Name';
+    const to = document.getElementById('invTo').value.trim() || 'Client Name';
+    const number = document.getElementById('invNumber').value.trim() || 'INV-001';
+    const date = document.getElementById('invDate').value || new Date().toISOString().slice(0, 10);
+    const notes = document.getElementById('invNotes').value.trim();
+    const total = updateInvoiceTotal();
+
+    let rowsHtml = '';
+    document.querySelectorAll('#invoiceRows .invoice-row-grid').forEach(row => {
+      const inputs = row.querySelectorAll('input');
+      const desc = inputs[0].value.trim();
+      const qty = parseFloat(inputs[1].value) || 0;
+      const rate = parseFloat(inputs[2].value) || 0;
+      if (!desc && qty === 0 && rate === 0) return;
+      rowsHtml += `<tr><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;">${desc || '—'}</td><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;text-align:center;">${qty}</td><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;text-align:right;">$${rate.toFixed(2)}</td><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;text-align:right;">$${(qty*rate).toFixed(2)}</td></tr>`;
+    });
+
+    const win = window.open('', '_blank');
+    win.document.write(`
+      <html><head><title>Invoice ${number}</title>
+      <style>
+        body{font-family:Arial,Helvetica,sans-serif;color:#111;padding:48px;max-width:720px;margin:0 auto;}
+        h1{font-size:1.6rem;margin-bottom:4px;}
+        table{width:100%;border-collapse:collapse;margin-top:24px;}
+        th{text-align:left;padding:10px 8px;border-bottom:2px solid #111;font-size:0.85rem;}
+        .total-row{font-weight:700;font-size:1.1rem;}
+        .meta{color:#555;font-size:0.9rem;margin-top:6px;}
+      </style></head>
+      <body>
+        <h1>Invoice</h1>
+        <div class="meta">${number} · ${date}</div>
+        <div style="display:flex;justify-content:space-between;margin-top:28px;">
+          <div><strong>From</strong><br>${from}</div>
+          <div style="text-align:right;"><strong>Bill to</strong><br>${to}</div>
+        </div>
+        <table>
+          <tr><th>Description</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Rate</th><th style="text-align:right;">Amount</th></tr>
+          ${rowsHtml}
+        </table>
+        <div style="display:flex;justify-content:flex-end;margin-top:18px;" class="total-row">Total: $${total.toFixed(2)}</div>
+        ${notes ? `<div style="margin-top:32px;color:#555;font-size:0.88rem;">${notes}</div>` : ''}
+        <script>window.onload = () => setTimeout(() => window.print(), 250);<\/script>
+      </body></html>
+    `);
+    win.document.close();
+  }
+
+  // ===== SCREENSHOT BEAUTIFIER (free, client-side canvas) =====
+  let ssImage = null;
+  let selectedSsBg = 'linear-gradient(135deg,#667eea,#764ba2)';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const bgRow = document.getElementById('ssBgRow');
+    if (bgRow) {
+      bgRow.querySelectorAll('.util-swatch').forEach(sw => {
+        sw.addEventListener('click', () => {
+          bgRow.querySelectorAll('.util-swatch').forEach(s => s.classList.remove('selected'));
+          sw.classList.add('selected');
+          selectedSsBg = sw.dataset.ssbg;
+          updateSsPreview();
+        });
+      });
+    }
+  });
+
+  function openScreenshotModal() {
+    document.getElementById('screenshotModal').classList.add('active');
+  }
+
+  function handleScreenshotUpload(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    const img = new Image();
+    img.onload = () => {
+      ssImage = img;
+      document.getElementById('ssDropLabel').textContent = file.name;
+      document.getElementById('ssCanvas').style.display = 'block';
+      document.getElementById('ssDownloadBtn').style.display = 'block';
+      updateSsPreview();
+    };
+    img.src = URL.createObjectURL(file);
+  }
+
+  function updateSsPreview() {
+    const padding = parseInt(document.getElementById('ssPadding').value, 10);
+    const radius = parseInt(document.getElementById('ssRadius').value, 10);
+    document.getElementById('ssPaddingVal').textContent = padding + 'px';
+    document.getElementById('ssRadiusVal').textContent = radius + 'px';
+    if (!ssImage) return;
+
+    const canvas = document.getElementById('ssCanvas');
+    const w = ssImage.width + padding * 2;
+    const h = ssImage.height + padding * 2;
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+
+    if (selectedSsBg.startsWith('linear-gradient')) {
+      const colors = selectedSsBg.match(/#[0-9a-fA-F]{3,6}/g) || ['#667eea', '#764ba2'];
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, colors[0]); grad.addColorStop(1, colors[1] || colors[0]);
+      ctx.fillStyle = grad;
+    } else {
+      ctx.fillStyle = selectedSsBg;
+    }
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    const r = Math.min(radius, ssImage.width / 2, ssImage.height / 2);
+    ctx.beginPath();
+    ctx.moveTo(padding + r, padding);
+    ctx.arcTo(padding + ssImage.width, padding, padding + ssImage.width, padding + ssImage.height, r);
+    ctx.arcTo(padding + ssImage.width, padding + ssImage.height, padding, padding + ssImage.height, r);
+    ctx.arcTo(padding, padding + ssImage.height, padding, padding, r);
+    ctx.arcTo(padding, padding, padding + ssImage.width, padding, r);
+    ctx.closePath();
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 18;
+    ctx.fill();
+    ctx.clip();
+    ctx.drawImage(ssImage, padding, padding);
+    ctx.restore();
+  }
+
+  function downloadScreenshot() {
+    const canvas = document.getElementById('ssCanvas');
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'beautified-screenshot.png';
+    a.click();
+  }
+
+  // ===== IMAGE COMPRESSOR & CONVERTER (free, client-side canvas) =====
+  let imgToolImage = null;
+  let imgToolOriginalSize = 0;
+
+  function openImageToolModal() {
+    document.getElementById('imageToolModal').classList.add('active');
+  }
+
+  function handleImageToolUpload(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    imgToolOriginalSize = file.size;
+    const img = new Image();
+    img.onload = () => {
+      imgToolImage = img;
+      document.getElementById('imgDropLabel').textContent = file.name;
+      document.getElementById('imgDownloadBtn').style.display = 'block';
+      updateImgPreview();
+    };
+    img.src = URL.createObjectURL(file);
+  }
+
+  function updateImgPreview() {
+    const format = document.getElementById('imgFormat').value;
+    const quality = parseInt(document.getElementById('imgQuality').value, 10);
+    document.getElementById('imgQualityVal').textContent = quality + '%';
+    document.getElementById('imgQualityGroup').style.display = (format === 'image/png') ? 'none' : 'block';
+    if (!imgToolImage) return;
+
+    const canvas = document.getElementById('imgCanvas');
+    canvas.width = imgToolImage.width;
+    canvas.height = imgToolImage.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imgToolImage, 0, 0);
+
+    const dataUrl = canvas.toDataURL(format, quality / 100);
+    const newSize = Math.round((dataUrl.length - dataUrl.indexOf(',') - 1) * 0.75);
+    const origKb = (imgToolOriginalSize / 1024).toFixed(0);
+    const newKb = (newSize / 1024).toFixed(0);
+    const savedPct = imgToolOriginalSize ? Math.max(0, Math.round((1 - newSize / imgToolOriginalSize) * 100)) : 0;
+    const compare = document.getElementById('imgSizeCompare');
+    compare.style.display = 'block';
+    compare.textContent = `${origKb}KB → ${newKb}KB${savedPct > 0 ? ` (${savedPct}% smaller)` : ''}`;
+  }
+
+  function downloadImageTool() {
+    const canvas = document.getElementById('imgCanvas');
+    const format = document.getElementById('imgFormat').value;
+    const quality = parseInt(document.getElementById('imgQuality').value, 10) / 100;
+    const ext = format === 'image/png' ? 'png' : (format === 'image/webp' ? 'webp' : 'jpg');
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL(format, quality);
+    a.download = `compressed.${ext}`;
+    a.click();
   }
 
   // ===== SHARED TOOL HELPER =====
