@@ -1671,18 +1671,222 @@
     border-radius: 100px;
     transition: width 0.3s ease;
   }
-  /* Force Google button full width */
-  #googleRenderContainer > div,
-  #googleRenderContainer iframe,
-  #googleRenderContainer > div > div {
-    width: 100% !important;
-    min-width: 100% !important;
+
+  /* ============================================================
+     PREMIUM ANIMATIONS — Full Package
+  ============================================================ */
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
   }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal-left.visible { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal-right.visible { opacity: 1; transform: translateX(0); }
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+  /* Stagger delay helpers */
+  .delay-1 { transition-delay: 0.08s !important; }
+  .delay-2 { transition-delay: 0.16s !important; }
+  .delay-3 { transition-delay: 0.24s !important; }
+  .delay-4 { transition-delay: 0.32s !important; }
+  .delay-5 { transition-delay: 0.40s !important; }
+  .delay-6 { transition-delay: 0.48s !important; }
+
+  /* Hero particles canvas */
+  #heroParticles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero { overflow: hidden; }
+  .hero > * { position: relative; z-index: 1; }
+
+  /* Hero glowing orbs */
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: orbFloat 8s ease-in-out infinite;
+    z-index: 0;
+  }
+  .hero-orb-1 {
+    width: 400px; height: 400px;
+    background: rgba(212,255,63,0.08);
+    top: -100px; right: -80px;
+    animation-delay: 0s;
+  }
+  .hero-orb-2 {
+    width: 300px; height: 300px;
+    background: rgba(124,111,255,0.07);
+    bottom: -50px; left: -60px;
+    animation-delay: -3s;
+  }
+  .hero-orb-3 {
+    width: 200px; height: 200px;
+    background: rgba(255,90,95,0.05);
+    top: 40%; left: 40%;
+    animation-delay: -5s;
+  }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(0) scale(1); }
+    33% { transform: translateY(-30px) scale(1.05); }
+    66% { transform: translateY(15px) scale(0.97); }
+  }
+
+  /* Tool cards — premium hover */
+  .tool-card {
+    transition: transform 0.3s cubic-bezier(0.16,1,0.3,1),
+                box-shadow 0.3s cubic-bezier(0.16,1,0.3,1),
+                border-color 0.3s ease !important;
+  }
+  .tool-card:hover {
+    transform: translateY(-6px) scale(1.02) !important;
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.5), 0 0 0 1px var(--lime) !important;
+    border-color: var(--lime) !important;
+  }
+  .tool-card:active {
+    transform: translateY(-2px) scale(0.99) !important;
+  }
+
+  /* Glow on tool card icon on hover */
+  .tool-card:hover .tool-icon {
+    filter: drop-shadow(0 0 8px rgba(212,255,63,0.6));
+    transition: filter 0.3s;
+  }
+
+  /* Nav glow on scroll */
+  nav.scrolled {
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 1px 0 rgba(212,255,63,0.08) !important;
+  }
+
+  /* Lime button pulse glow */
+  .btn-primary {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+  .btn-primary:hover::after {
+    transform: translateX(100%);
+  }
+
+  /* Section heads */
+  .section-head { overflow: hidden; }
+
+  /* Floating badge animation */
+  @keyframes badgeFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* Cursor glow that follows mouse */
+  #cursorGlow {
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,255,63,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: left 0.15s ease, top 0.15s ease;
+  }
+
+  /* Counter number animation */
+  .count-up {
+    display: inline-block;
+  }
+
+  /* Shimmer loading effect on cards */
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  /* Typing cursor blink */
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Staggered tool card entry */
+  .tool-card {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.3s, border-color 0.3s !important;
+  }
+  .tool-card.card-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .tool-card:hover {
+    transform: translateY(-6px) scale(1.02) !important;
+  }
+
+  /* How it works steps */
+  .hiw-step {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .hiw-step:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  }
+
+  /* Scroll progress bar */
+  #scrollProgress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--lime), rgba(212,255,63,0.4));
+    z-index: 9999;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px rgba(212,255,63,0.5);
+  }
+
+  /* Magnetic button effect helper */
+  .magnetic { transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+
 </style>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://Accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+
+<!-- Scroll progress bar -->
+<div id="scrollProgress" style="width:0%;"></div>
+<!-- Cursor glow -->
+<div id="cursorGlow"></div>
 
 <nav>
   <div class="wrap">
@@ -1705,6 +1909,10 @@
 </nav>
 
 <section class="hero">
+  <canvas id="heroParticles"></canvas>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow" style="animation:fadeInUp 0.5s ease both;">19 AI tools · one price · no subscription</div>
@@ -1814,7 +2022,7 @@
 
 <section class="how-it-works" id="how-it-works">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="section-eyebrow">HOW IT WORKS</div>
       <h2>Open a tool. Type one line. Done.</h2>
     </div>
@@ -1843,7 +2051,7 @@
 
 <section class="section" id="tools">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="section-eyebrow">// the toolkit</div>
       <h2>Twenty-five tools. Every content task covered.</h2>
       <p>No dashboard to learn, no form to fill. Open a tool, type one line, get results. That simple.</p>
@@ -2146,7 +2354,7 @@
 <!-- REVIEWS SECTION -->
 <section class="section" style="padding-bottom:20px;">
   <div class="wrap">
-    <div class="section-head">
+    <div class="section-head reveal">
       <div class="section-eyebrow">// what creators say</div>
       <h2>Loved by 11,200+ creators.</h2>
     </div>
@@ -3097,7 +3305,7 @@
 
     <!-- Google Login Button -->
     <div id="authGoogleSection">
-      <div style="width:100%;margin-bottom:16px;position:relative;">
+      <div style="width:100%;margin-bottom:16px;">
         <div id="googleRenderContainer" style="width:100%;"></div>
       </div>
 
@@ -3765,17 +3973,11 @@
   const GOOGLE_CLIENT_ID = '1010775835289-qqhk2b0s6s11hu32phksco1rttr1sddv.apps.googleusercontent.com';
   let googleInitialized = false;
   let googleBtnRendered = false;
-
   function initGoogle() {
     if (googleInitialized || typeof google === 'undefined') return;
     googleInitialized = true;
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleGoogleCredential,
-      use_fedcm_for_prompt: false
-    });
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential, use_fedcm_for_prompt: false });
   }
-
   function renderGoogleBtn() {
     if (googleBtnRendered || typeof google === 'undefined') return;
     const container = document.getElementById('googleRenderContainer');
@@ -3783,22 +3985,9 @@
     initGoogle();
     googleBtnRendered = true;
     const w = Math.floor(container.parentElement.getBoundingClientRect().width || 400);
-    google.accounts.id.renderButton(container, {
-      type: 'standard',
-      theme: 'outline',
-      size: 'large',
-      width: w,
-      text: 'continue_with'
-    });
+    google.accounts.id.renderButton(container, { type: 'standard', theme: 'outline', size: 'large', width: w, text: 'continue_with' });
   }
-
-  window.addEventListener('load', function() {
-    if (typeof google !== 'undefined') {
-      initGoogle();
-      setTimeout(renderGoogleBtn, 200);
-    }
-  });
-
+  window.addEventListener('load', function() { if (typeof google !== 'undefined') { initGoogle(); setTimeout(renderGoogleBtn, 200); } });
   function signInWithGoogle() { renderGoogleBtn(); }
 
   async function handleGoogleCredential(response) {
@@ -5705,3 +5894,193 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
 
 </body>
 </html>
+<script>
+// ============================================================
+// PREMIUM ANIMATIONS JS
+// ============================================================
+
+// 1. SCROLL PROGRESS BAR
+const scrollBar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+  if (scrollBar) scrollBar.style.width = pct + '%';
+}, { passive: true });
+
+// 2. CURSOR GLOW (desktop only)
+const cursorGlow = document.getElementById('cursorGlow');
+if (cursorGlow && window.innerWidth > 768) {
+  document.addEventListener('mousemove', e => {
+    cursorGlow.style.left = e.clientX + 'px';
+    cursorGlow.style.top = e.clientY + 'px';
+  }, { passive: true });
+}
+
+// 3. SCROLL REVEAL (IntersectionObserver)
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+  revealObserver.observe(el);
+});
+
+// 4. STAGGERED TOOL CARDS
+const toolCards = document.querySelectorAll('.tool-card');
+const cardObserver = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => {
+        e.target.classList.add('card-visible');
+      }, (Array.from(toolCards).indexOf(e.target) % 6) * 80);
+      cardObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+toolCards.forEach(card => cardObserver.observe(card));
+
+// 5. NAV SCROLL EFFECT
+const nav = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  if (nav) nav.classList.toggle('scrolled', window.scrollY > 30);
+}, { passive: true });
+
+// 6. HERO PARTICLES CANVAS
+(function() {
+  const canvas = document.getElementById('heroParticles');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], animId;
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function Particle() {
+    this.reset();
+  }
+  Particle.prototype.reset = function() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.r = Math.random() * 1.5 + 0.5;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.alpha = Math.random() * 0.5 + 0.1;
+    this.color = Math.random() > 0.6 ? '212,255,63' : '124,111,255';
+  };
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  };
+
+  function init() {
+    resize();
+    particles = Array.from({length: 60}, () => new Particle());
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Draw particles
+    particles.forEach(p => {
+      p.update();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.alpha})`;
+      ctx.fill();
+    });
+    // Draw connections
+    particles.forEach((a, i) => {
+      particles.slice(i+1).forEach(b => {
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (dist < 100) {
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(212,255,63,${0.06 * (1 - dist/100)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
+    });
+    animId = requestAnimationFrame(draw);
+  }
+
+  init();
+  draw();
+  window.addEventListener('resize', () => { resize(); }, { passive: true });
+})();
+
+// 7. COUNT UP ANIMATION for stats
+function countUp(el, target, duration) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = Math.floor(start).toLocaleString();
+  }, 16);
+}
+
+const statObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const val = parseInt(el.dataset.count);
+      if (val) countUp(el, val, 1200);
+      statObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-count]').forEach(el => statObserver.observe(el));
+
+// 8. MAGNETIC BUTTON EFFECT on primary buttons
+document.querySelectorAll('.btn-primary, .nav-cta').forEach(btn => {
+  btn.addEventListener('mousemove', function(e) {
+    const r = this.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width/2;
+    const y = e.clientY - r.top - r.height/2;
+    this.style.transform = `translate(${x*0.12}px, ${y*0.12}px) translateY(-2px)`;
+  });
+  btn.addEventListener('mouseleave', function() {
+    this.style.transform = '';
+  });
+});
+
+// 9. SECTION REVEALS — add reveal class dynamically to sections
+document.querySelectorAll('section').forEach((sec, i) => {
+  if (!sec.classList.contains('hero')) {
+    sec.style.opacity = '0';
+    sec.style.transform = 'translateY(30px)';
+    sec.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+    revealObserver.observe(sec);
+    sec.addEventListener('intersect', () => {
+      sec.style.opacity = '1';
+      sec.style.transform = 'translateY(0)';
+    });
+  }
+});
+
+const sectionReveal = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+      sectionReveal.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+document.querySelectorAll('section:not(.hero)').forEach(sec => {
+  sec.style.opacity = '0';
+  sec.style.transform = 'translateY(30px)';
+  sec.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
+  sectionReveal.observe(sec);
+});
+
+</script>
