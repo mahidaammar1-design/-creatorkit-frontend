@@ -3090,10 +3090,11 @@
 
     <!-- Google Login Button -->
     <div id="authGoogleSection">
-      <button id="googleSignInBtn" onclick="signInWithGoogle()" style="width:100%;background:white;color:#1a1a1a;border:1px solid #ddd;border-radius:10px;padding:11px;font-family:inherit;font-size:0.9rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;transition:opacity 0.2s;">
-        <svg id="googleBtnIcon" width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.7 13.3l7.8 6C12.5 13.3 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.4c-.5 2.8-2.1 5.2-4.5 6.8l7 5.4c4.1-3.8 6.5-9.4 6.5-16.2z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L2.5 13.3A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8-5.9z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7-5.4C30.2 38.8 27.3 39.5 24 39.5c-6.2 0-11.5-3.8-13.5-9.2l-7.8 6C6.7 44.6 14.7 48 24 48z"/></svg>
-        <span id="googleBtnText">Continue with Google</span>
-      </button>
+      <!-- Google renders its own button here — instant, no delay -->
+      <div id="googleRenderContainer" onclick="renderGoogleBtn()" style="width:100%;margin-bottom:16px;min-height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px;border:1px solid #ddd;background:white;">
+        <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0;"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.5 30.2 0 24 0 14.7 0 6.7 5.4 2.7 13.3l7.8 6C12.5 13.3 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.4c-.5 2.8-2.1 5.2-4.5 6.8l7 5.4c4.1-3.8 6.5-9.4 6.5-16.2z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L2.5 13.3A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8-5.9z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7-5.4C30.2 38.8 27.3 39.5 24 39.5c-6.2 0-11.5-3.8-13.5-9.2l-7.8 6C6.7 44.6 14.7 48 24 48z"/></svg>
+        <span style="margin-left:10px;font-family:inherit;font-size:0.9rem;font-weight:600;color:#1a1a1a;">Continue with Google</span>
+      </div>
 
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
@@ -3755,57 +3756,48 @@
     }
   })();
 
-  // Google Sign In — with loading state
+  // Google Sign In — using renderButton (most reliable, works first click)
+  const GOOGLE_CLIENT_ID = '1010775835289-qqhk2b0s6s11hu32phksco1rttr1sddv.apps.googleusercontent.com';
   let googleInitialized = false;
+  let googleBtnRendered = false;
 
   function initGoogle() {
     if (googleInitialized || typeof google === 'undefined') return;
     googleInitialized = true;
     google.accounts.id.initialize({
-      client_id: '1010775835289-qqhk2b0s6s11hu32phksco1rttr1sddv.apps.googleusercontent.com',
+      client_id: GOOGLE_CLIENT_ID,
       callback: handleGoogleCredential,
-      use_fedcm_for_prompt: false,
-      cancel_on_tap_outside: false
+      use_fedcm_for_prompt: false
+    });
+  }
+
+  function renderGoogleBtn() {
+    if (googleBtnRendered) return;
+    const container = document.getElementById('googleRenderContainer');
+    if (!container || typeof google === 'undefined') return;
+    googleBtnRendered = true;
+    initGoogle();
+    google.accounts.id.renderButton(container, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      width: container.offsetWidth || 360,
+      text: 'continue_with'
     });
   }
 
   window.addEventListener('load', function() {
-    if (typeof google !== 'undefined') initGoogle();
+    if (typeof google !== 'undefined') {
+      initGoogle();
+      // Small delay to let auth modal CSS load
+      setTimeout(renderGoogleBtn, 300);
+    }
   });
 
   function signInWithGoogle() {
-    // Show loading state on button
-    const btn = document.getElementById('googleSignInBtn');
-    const txt = document.getElementById('googleBtnText');
-    const ico = document.getElementById('googleBtnIcon');
-    if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
-    if (txt) txt.textContent = 'Opening Google...';
-    if (ico) ico.style.display = 'none';
-
-    function resetBtn() {
-      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
-      if (txt) txt.textContent = 'Continue with Google';
-      if (ico) ico.style.display = '';
-    }
-
+    // This is now just a fallback — real button is rendered by Google
     initGoogle();
-    google.accounts.id.prompt(function(notification) {
-      resetBtn();
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        const tempDiv = document.createElement('div');
-        tempDiv.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
-        document.body.appendChild(tempDiv);
-        google.accounts.id.renderButton(tempDiv, { type: 'standard', theme: 'outline', size: 'large' });
-        setTimeout(() => {
-          const b = tempDiv.querySelector('div[role=button]') || tempDiv.querySelector('iframe');
-          if (b) b.click();
-          setTimeout(() => tempDiv.remove(), 3000);
-        }, 200);
-      }
-    });
-
-    // Reset button after 6 sec max (safety)
-    setTimeout(resetBtn, 6000);
+    renderGoogleBtn();
   }
 
   async function handleGoogleCredential(response) {
@@ -4136,6 +4128,11 @@
     pendingAuthIntent = intent || null;
     document.getElementById('authModal').classList.add('active');
     showAuthTab('login');
+    // Render Google button when modal opens
+    setTimeout(() => {
+      googleBtnRendered = false; // reset so it re-renders with correct width
+      renderGoogleBtn();
+    }, 100);
   }
 
   function closeAuthModal() {
