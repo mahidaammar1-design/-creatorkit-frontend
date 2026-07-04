@@ -3755,15 +3755,35 @@
     }
   })();
 
-  // Google Sign In
-  function signInWithGoogle() {
+  // Google Sign In — initialize only once
+  let googleInitialized = false;
+
+  function initGoogle() {
+    if (googleInitialized) return;
+    googleInitialized = true;
     google.accounts.id.initialize({
-      // IMPORTANT: Yeh apna Google Client ID se replace karna hai
-      // Google Cloud Console → APIs & Services → Credentials → Create OAuth 2.0 Client ID
       client_id: '1010775835289-qqhk2b0s6s11hu32phksco1rttr1sddv.apps.googleusercontent.com',
-      callback: handleGoogleCredential
+      callback: handleGoogleCredential,
+      use_fedcm_for_prompt: false
     });
-    google.accounts.id.prompt();
+  }
+
+  function signInWithGoogle() {
+    initGoogle();
+    google.accounts.id.prompt(function(notification) {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        // Fallback: open Google account chooser via renderButton
+        const tempDiv = document.createElement('div');
+        tempDiv.style.cssText = 'position:fixed;top:-9999px;left:-9999px;';
+        document.body.appendChild(tempDiv);
+        google.accounts.id.renderButton(tempDiv, { type: 'standard', theme: 'outline', size: 'large' });
+        setTimeout(() => {
+          const btn = tempDiv.querySelector('div[role=button]') || tempDiv.querySelector('iframe');
+          if (btn) btn.click();
+          setTimeout(() => tempDiv.remove(), 3000);
+        }, 300);
+      }
+    });
   }
 
   async function handleGoogleCredential(response) {
