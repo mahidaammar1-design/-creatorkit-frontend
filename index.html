@@ -5800,6 +5800,7 @@
       if (captions.length === 0) {
         results.innerHTML = '<div class="result-card"><div class="result-text">Something went wrong. Please try again.</div></div>';
       } else {
+        results.innerHTML = '';
         captions.forEach((cap, i) => {
           const card = document.createElement('div');
           card.className = 'result-card';
@@ -6044,6 +6045,7 @@
       if (!allTags) {
         results.innerHTML = '<div class="result-card"><div class="result-text">Something went wrong. Please try again.</div></div>';
       } else {
+        results.innerHTML = '';
         const card = document.createElement('div');
         card.className = 'result-card';
         card.style.flexDirection = 'column';
@@ -6099,6 +6101,7 @@
       if (hooks.length === 0) {
         results.innerHTML = '<div class="result-card"><div class="result-text">Something went wrong. Please try again.</div></div>';
       } else {
+        results.innerHTML = '';
         hooks.forEach(hook => {
           const card = document.createElement('div');
           card.className = 'result-card';
@@ -6154,6 +6157,7 @@
       if (lines.length === 0) {
         results.innerHTML = '<div class="result-card"><div class="result-text">Something went wrong. Please try again.</div></div>';
       } else {
+        results.innerHTML = '';
         const fullScript = lines.join('\n');
         const card = document.createElement('div');
         card.className = 'result-card';
@@ -6243,6 +6247,7 @@
       if (bios.length === 0) {
         results.innerHTML = '<div class="result-card"><div class="result-text">Something went wrong. Please try again.</div></div>';
       } else {
+        results.innerHTML = '';
         bios.forEach(bio => {
           const card = document.createElement('div');
           card.className = 'result-card';
@@ -6827,6 +6832,7 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       if (!text.trim()) {
         results.innerHTML = '<div class="result-card"><div class="result-text">Something went wrong. Please try again.</div></div>';
       } else if (parseMode === 'lines') {
+        results.innerHTML = '';
         const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         lines.forEach(line => {
           const card = document.createElement('div');
@@ -6838,6 +6844,7 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
         if (toolName) saveToHistory(toolName, inputSummary || '', lines.join('\n'));
         if (toolName) results.insertAdjacentHTML('beforeend', comboSuggestionHTML(toolName, resultsId));
       } else {
+        results.innerHTML = '';
         const card = document.createElement('div');
         card.className = 'result-card';
         card.style.flexDirection = 'column';
