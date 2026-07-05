@@ -188,9 +188,7 @@
     }
 
     #installAppBtn {
-      padding: 6px 10px !important;
-      font-size: 0.72rem !important;
-      flex-shrink: 0;
+      display: none !important;
     }
 
     #navLoginBtn {
@@ -3987,6 +3985,10 @@
       <div class="profile-tools-list" id="profileToolsList"></div>
 
       <div class="profile-action-row">
+        <button class="profile-action-btn" id="profileInstallBtn" onclick="installApp()" style="display:none;">
+          <span>📲 Install app</span>
+          <span class="arrow">→</span>
+        </button>
         <button class="profile-action-btn" onclick="toggleTheme()">
           <span>🎨 Switch to <span id="profileThemeLabel">light</span> mode</span>
           <span class="arrow">→</span>
@@ -4952,21 +4954,27 @@
     deferredInstallPrompt = e;
     const btn = document.getElementById('installAppBtn');
     if (btn) btn.style.display = 'inline-flex';
+    const profileBtn = document.getElementById('profileInstallBtn');
+    if (profileBtn) profileBtn.style.display = 'flex';
   });
 
   function installApp() {
     const btn = document.getElementById('installAppBtn');
+    const profileBtn = document.getElementById('profileInstallBtn');
     if (!deferredInstallPrompt) return;
     deferredInstallPrompt.prompt();
     deferredInstallPrompt.userChoice.finally(function () {
       deferredInstallPrompt = null;
       if (btn) btn.style.display = 'none';
+      if (profileBtn) profileBtn.style.display = 'none';
     });
   }
 
   window.addEventListener('appinstalled', function () {
     const btn = document.getElementById('installAppBtn');
     if (btn) btn.style.display = 'none';
+    const profileBtn = document.getElementById('profileInstallBtn');
+    if (profileBtn) profileBtn.style.display = 'none';
     showNotify('🎉 CreatorKit installed! Find it on your home screen.', 'success');
   });
 
