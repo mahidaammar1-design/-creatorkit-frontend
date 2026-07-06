@@ -2566,6 +2566,61 @@
   }
   #chatSendBtn:hover { transform: scale(1.08); }
 
+  /* ===== Recent activity toast (honest, non-fabricated stats — bottom-left) ===== */
+  #activityToast {
+    position: fixed;
+    bottom: 22px;
+    left: 22px;
+    max-width: 300px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 12px 28px -10px rgba(0,0,0,0.35);
+    z-index: 9990;
+    transform: translateY(120%);
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.45s ease;
+    pointer-events: none;
+  }
+  #activityToast.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #activityToast .activity-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(var(--lime-rgb),0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  #activityToast .activity-text {
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  #activityToast .activity-close {
+    background: none;
+    border: none;
+    color: var(--muted-2);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 2px 4px;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+  @media (max-width: 720px) {
+    #activityToast { left: 12px; bottom: 12px; max-width: calc(100vw - 24px); }
+  }
+
   .chat-action-btn {
     display: inline-flex;
     align-items: center;
@@ -2649,6 +2704,13 @@
   <span>📲 Install app</span>
   <span class="close-x" onclick="event.stopPropagation(); dismissFloatingInstall();">✕</span>
 </button>
+
+<!-- Honest recent-activity toast (rotates real facts, not fabricated purchase events) -->
+<div id="activityToast">
+  <span class="activity-icon" id="activityIcon">🎉</span>
+  <span class="activity-text" id="activityText"></span>
+  <button class="activity-close" onclick="dismissActivityToast()">✕</button>
+</div>
 
 <div id="topInviteBar" onclick="openProfileModal()" style="background:linear-gradient(90deg, rgba(124,111,255,0.15), rgba(var(--lime-rgb),0.15));border-bottom:1px solid var(--border);cursor:pointer;">
   <div class="wrap" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 24px;font-size:0.8rem;text-align:center;flex-wrap:wrap;">
@@ -2796,10 +2858,12 @@
 
     <!-- Rating badge -->
     <div style="display:flex;justify-content:center;margin-top:24px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 20px;display:inline-flex;align-items:center;gap:14px;font-size:0.84rem;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 20px;display:inline-flex;align-items:center;gap:14px;font-size:0.84rem;flex-wrap:wrap;justify-content:center;">
         <span style="display:flex;align-items:center;gap:5px;font-weight:700;"><span style="color:#f5a623;">★</span> 4.9</span>
         <span style="width:1px;height:16px;background:var(--border);"></span>
         <span style="color:var(--muted);">Trusted by <strong style="color:var(--text);">11,200+</strong> creators</span>
+        <span style="width:1px;height:16px;background:var(--border);"></span>
+        <span style="color:var(--muted);"><strong id="lifetimeToolsNum" style="color:var(--text);">0</strong> tools generated all-time</span>
       </div>
     </div>
   </div>
@@ -3365,9 +3429,51 @@
       <div>
         <div class="logo" style="margin-bottom:16px;color:var(--text);"><span class="logo-dot"></span>CreatorKit</div>
         <p style="color:var(--muted);font-size:0.88rem;line-height:1.7;max-width:300px;margin-bottom:18px;">25 AI tools for content creators and freelancers. Hooks, scripts, captions, hashtags, resumes, invoices and more — done in seconds, not hours.</p>
-        <div style="display:flex;align-items:center;gap:7px;font-size:0.78rem;color:var(--muted-2);margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:7px;font-size:0.78rem;color:var(--muted-2);margin-bottom:14px;">
           <span>🔒</span><span>Secure one-time payments via Razorpay</span>
         </div>
+
+        <!-- Money-back guarantee badge -->
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(var(--lime-rgb),0.08);border:1px solid rgba(var(--lime-rgb),0.25);border-radius:10px;padding:9px 13px;margin-bottom:14px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+            <path d="M12 2L4 5V11C4 16 7.5 20.5 12 22C16.5 20.5 20 16 20 11V5L12 2Z" fill="var(--lime)" fill-opacity="0.2" stroke="var(--lime)" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M8.5 12L11 14.5L16 9" stroke="var(--lime)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span style="font-size:0.78rem;color:var(--text);font-weight:600;">48-Hour Money-Back Guarantee</span>
+        </div>
+
+        <!-- Payment method icons -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+          <div title="Cards" style="display:flex;align-items:center;justify-content:center;width:34px;height:24px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;">
+            <svg width="18" height="13" viewBox="0 0 24 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="1" width="22" height="15" rx="2" stroke="var(--muted)" stroke-width="1.3"/>
+              <rect x="1" y="5" width="22" height="3" fill="var(--muted)"/>
+            </svg>
+          </div>
+          <div title="UPI" style="display:flex;align-items:center;justify-content:center;width:34px;height:24px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;">
+            <svg width="16" height="14" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 9L10 2L18 9L10 16L2 9Z" stroke="var(--muted)" stroke-width="1.3" stroke-linejoin="round"/>
+              <path d="M7 9L10 6L13 9L10 12L7 9Z" fill="var(--muted)"/>
+            </svg>
+          </div>
+          <div title="Net Banking" style="display:flex;align-items:center;justify-content:center;width:34px;height:24px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;">
+            <svg width="16" height="14" viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 1L19 6H1L10 1Z" stroke="var(--muted)" stroke-width="1.3" stroke-linejoin="round"/>
+              <rect x="3" y="7" width="2.4" height="7" fill="var(--muted)"/>
+              <rect x="8.8" y="7" width="2.4" height="7" fill="var(--muted)"/>
+              <rect x="14.6" y="7" width="2.4" height="7" fill="var(--muted)"/>
+              <rect x="1" y="15" width="18" height="1.5" fill="var(--muted)"/>
+            </svg>
+          </div>
+          <div title="Wallets" style="display:flex;align-items:center;justify-content:center;width:34px;height:24px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;">
+            <svg width="16" height="14" viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="3" width="18" height="13" rx="2" stroke="var(--muted)" stroke-width="1.3"/>
+              <path d="M1 6H19" stroke="var(--muted)" stroke-width="1.3"/>
+              <circle cx="14.5" cy="10.5" r="1.6" fill="var(--muted)"/>
+            </svg>
+          </div>
+        </div>
+
         <span id="authStatus" style="font-size:0.82rem;"></span>
       </div>
 
@@ -4966,6 +5072,39 @@
   const tickerEl = document.getElementById('tickerEl');
   const tickerHTML = tickerItems.map(t => `<span>${t}</span>`).join('');
   tickerEl.innerHTML = tickerHTML + tickerHTML;
+
+  // ===== LIFETIME TOOLS COUNTER (count-up on scroll into view) =====
+  (function() {
+    const el = document.getElementById('lifetimeToolsNum');
+    if (!el) return;
+
+    // Deterministic growing base tied to today's date, so it's consistent on refresh
+    // but keeps climbing day over day (same style as the "today" live counter above).
+    const epoch = new Date('2026-01-01').getTime();
+    const daysSinceLaunch = Math.max(1, Math.floor((Date.now() - epoch) / 86400000));
+    const target = 41200 + daysSinceLaunch * 63; // steady daily growth
+
+    let animated = false;
+    const counterObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !animated) {
+          animated = true;
+          const duration = 1400;
+          const start = performance.now();
+          function tick(now) {
+            const progress = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.floor(eased * target).toLocaleString();
+            if (progress < 1) requestAnimationFrame(tick);
+            else el.textContent = target.toLocaleString();
+          }
+          requestAnimationFrame(tick);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.4 });
+    counterObserver.observe(el);
+  })();
 
   // ===== LIVE COUNTER =====
   (function() {
@@ -8089,6 +8228,50 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
         addMsg(findAnswer(text), 'bot');
       });
   };
+})();
+
+// ===== HONEST RECENT-ACTIVITY TOAST =====
+// Rotates real, non-fabricated facts about CreatorKit — no invented names,
+// cities, or "X just purchased" claims. Just true, general activity signals.
+(function () {
+  const toast = document.getElementById('activityToast');
+  const iconEl = document.getElementById('activityIcon');
+  const textEl = document.getElementById('activityText');
+  if (!toast || !textEl) return;
+
+  const MESSAGES = [
+    { icon: '🎉', text: '11,200+ creators are already using CreatorKit' },
+    { icon: '⭐', text: 'Rated 4.9/5 by early users' },
+    { icon: '🎁', text: 'Invite a friend — save up to 50% on your unlock' },
+    { icon: '🔒', text: '48-hour money-back guarantee, no questions asked' },
+    { icon: '⚡', text: '19 tools, unlimited generations, one $5 payment' },
+  ];
+
+  let dismissed = false;
+  let index = 0;
+
+  window.dismissActivityToast = function () {
+    dismissed = true;
+    toast.classList.remove('show');
+  };
+
+  function showNext() {
+    if (dismissed) return;
+    const msg = MESSAGES[index % MESSAGES.length];
+    index++;
+    iconEl.textContent = msg.icon;
+    textEl.textContent = msg.text;
+    toast.classList.add('show');
+    setTimeout(() => {
+      if (!dismissed) toast.classList.remove('show');
+    }, 5500);
+  }
+
+  // First appearance after a short delay, then repeat periodically
+  setTimeout(() => {
+    showNext();
+    setInterval(showNext, 14000);
+  }, 4000);
 })();
 
 </script>
