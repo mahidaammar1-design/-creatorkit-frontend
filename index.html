@@ -7849,7 +7849,7 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
     { keys: ['platform', 'instagram', 'youtube', 'tiktok', 'linkedin', 'twitter'],
       a: "CreatorKit supports Instagram, YouTube, TikTok, LinkedIn, and Twitter/X.<br><br><b>Ye Instagram, YouTube, TikTok, LinkedIn, Twitter/X sab platforms ke liye kaam karta hai.</b>" },
     { keys: ['refund', 'money back', 'cancel', 'return', 'paise wapas', 'refund chahiye', 'paisa wapas'],
-      a: "Yes — if you change your mind within 48 hours of paying and haven't generated any content yet, email <a href=\"mailto:support@creatorkit.app\">support@creatorkit.app</a> for a full refund.<br><br><b>Haan, 48 ghante ke andar refund mil sakta hai</b> agar aapne koi tool use nahi kiya ho. Support ko email kar do." },
+      a: "Yes — if you change your mind within 48 hours of paying and haven't generated any content yet, email <a href=\"mailto:pbrammar82@gmail.com\">pbrammar82@gmail.com</a> for a full refund.<br><br><b>Haan, 48 ghante ke andar refund mil sakta hai</b> agar aapne koi tool use nahi kiya ho. Support ko email kar do." },
     { keys: ['login', 'log in', 'sign up', 'signup', 'account', 'password', 'login kaise', 'account kaise banaye'],
       a: "You can log in or create an account using the Log In / Get Started buttons in the top navigation. Forgot your password? There's a 'Forgot password' link that emails you a reset code.<br><br><b>Login/signup top navigation ke buttons se kar sakte ho.</b> Password bhool gaye ho to 'Forgot password' link use karo." },
     { keys: ['dark mode', 'light mode', 'theme', 'dark mode kaise', 'light mode kaise'],
@@ -7879,7 +7879,7 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
       });
     });
     if (best) return best.a;
-    return "I don't have an exact answer for that — but you can send me the details and I'll pass it straight to our team, or email <a href=\"mailto:support@creatorkit.app\">support@creatorkit.app</a> directly.<br><br><b>Mujhe iska exact jawab nahi pata, lekin aap detail bata do, main hamari team tak pahucha dunga.</b> Ya seedha 'Mujhe problem hai' likh ke bhi bata sakte ho." + reportButtonHtml();
+    return "I don't have an exact answer for that — but you can send me the details and I'll pass it straight to our team, or email <a href=\"mailto:pbrammar82@gmail.com\">pbrammar82@gmail.com</a> directly.<br><br><b>Mujhe iska exact jawab nahi pata, lekin aap detail bata do, main hamari team tak pahucha dunga.</b> Ya seedha 'Mujhe problem hai' likh ke bhi bata sakte ho." + reportButtonHtml();
   }
 
   function matchesAny(text, arr) {
@@ -7948,7 +7948,7 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
       "\n\nPage: " + window.location.href +
       "\nDate: " + new Date().toLocaleString()
     );
-    const mailLink = 'mailto:support@creatorkit.app?subject=' + subject + '&body=' + body;
+    const mailLink = 'mailto:pbrammar82@gmail.com?subject=' + subject + '&body=' + body;
     addMsg(
       "Got it, thanks for the details! 🙏 Tap the button below — it'll open your email app with everything pre-filled, just hit send and our team will see it.<br><br><b>Thik hai, detail mil gayi. Neeche button dabao — email app khulega, sab kuch pehle se likha hoga, bas send kar dena, hamari team ko dikh jayega.</b>" +
       '<div style="margin-top:10px;"><a href="' + mailLink + '" style="display:inline-block;" class="chat-action-btn">📩 Send Problem to Our Team</a></div>',
@@ -7974,6 +7974,20 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
     }
   };
 
+  let chatHistory = [];
+
+  async function askAiBackend(text) {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, history: chatHistory })
+    });
+    if (!response.ok) throw new Error('backend not available');
+    const data = await response.json();
+    if (!data.reply) throw new Error('empty reply');
+    return data.reply;
+  }
+
   window.sendChatMessage = function () {
     const input = document.getElementById('chatInput');
     const text = input.value.trim();
@@ -7983,28 +7997,46 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
     document.getElementById('chatSuggestions').innerHTML = '';
     showTyping();
 
-    setTimeout(() => {
-      hideTyping();
-      if (awaitingProblemDetails) {
-        handleProblemDetails(text);
-        return;
-      }
-      if (matchesAny(text, INSTALL_KEYS)) {
+    // Local flows that need real UI buttons (installing / reporting a problem)
+    // are always handled instantly on the client, even when the AI backend is live.
+    if (awaitingProblemDetails) {
+      setTimeout(() => { hideTyping(); handleProblemDetails(text); }, 500);
+      return;
+    }
+    if (matchesAny(text, INSTALL_KEYS)) {
+      setTimeout(() => {
+        hideTyping();
         addMsg(
           "You can install CreatorKit as an app right now — just tap the button below and follow the prompt. It'll then open like a native app from your home screen.<br><br><b>Neeche button dabao, app turant install ho jayega — phir home screen se seedha khul jayega.</b>" + installButtonHtml(),
           'bot'
         );
-        return;
-      }
-      if (matchesAny(text, PROBLEM_KEYS)) {
+      }, 500);
+      return;
+    }
+    if (matchesAny(text, PROBLEM_KEYS)) {
+      setTimeout(() => {
+        hideTyping();
         addMsg(
           "I'm sorry you're running into trouble! Tell me more, or tap below to send it straight to our team.<br><br><b>Koi baat nahi, bata do kya problem ho rahi hai — ya neeche button se seedha hamari team ko bhej do.</b>" + reportButtonHtml(),
           'bot'
         );
-        return;
-      }
-      addMsg(findAnswer(text), 'bot');
-    }, 550 + Math.random() * 400);
+      }, 500);
+      return;
+    }
+
+    // Try the real AI backend first; fall back to the local knowledge base
+    // automatically if the backend isn't deployed yet or errors out.
+    askAiBackend(text)
+      .then(reply => {
+        hideTyping();
+        chatHistory.push({ role: 'user', content: text });
+        chatHistory.push({ role: 'assistant', content: reply });
+        addMsg(reply.replace(/\n/g, '<br>'), 'bot');
+      })
+      .catch(() => {
+        hideTyping();
+        addMsg(findAnswer(text), 'bot');
+      });
   };
 })();
 
