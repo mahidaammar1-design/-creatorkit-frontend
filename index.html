@@ -7837,29 +7837,47 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
 (function () {
   const KB = [
     { keys: ['tool', 'tools', 'included', 'include', 'what do i get', 'features', 'what tools', 'kya milega', 'konse tool', 'kaunse tool', 'tools kya', 'sare tool'],
-      a: "The $5 plan unlocks all 19 tools — Hook Generator, Reel Script Writer, Caption Generator, Hashtag Finder, Comment Reply, Thumbnail Text, Content Calendar, YouTube Description + Tags, Collab Pitch DM, Bio Optimizer, Resume Bullet Writer, Tweet/X Post Generator, About Me Page Writer, Personal Brand Statement, Cold Email/DM for Gigs, Content Repurposing Tool, Poll/Question Post Ideas, Newsletter Intro Writer, and Apology/Crisis Response. New tools are added monthly at no extra cost.<br><br><b>$5 wale plan me sabhi 19 tools milte hain</b> — hooks, scripts, captions, hashtags aur bahut kuch. Har mahine naye tools bhi free me add hote hain." },
+      en: "The $5 plan unlocks all 19 tools — Hook Generator, Reel Script Writer, Caption Generator, Hashtag Finder, Comment Reply, Thumbnail Text, Content Calendar, YouTube Description + Tags, Collab Pitch DM, Bio Optimizer, Resume Bullet Writer, Tweet/X Post Generator, About Me Page Writer, Personal Brand Statement, Cold Email/DM for Gigs, Content Repurposing Tool, Poll/Question Post Ideas, Newsletter Intro Writer, and Apology/Crisis Response. New tools are added monthly at no extra cost.",
+      hi: "$5 wale plan me sabhi 19 tools milte hain — hooks, scripts, captions, hashtags aur bahut kuch. Har mahine naye tools bhi free me add hote hain." },
     { keys: ['price', 'pricing', 'cost', 'how much', '$5', 'subscription', 'monthly', 'one time', 'one-time', 'kitna paisa', 'kitne ka', 'price kya', 'daam', 'rate kya', 'kitna paise'],
-      a: "It's a one-time payment of $5 — lifetime access, no subscription, no renewals, no expiry.<br><br><b>Sirf $5 ek baar dena hai</b> — lifetime access milta hai, koi monthly charge nahi lagta." },
+      en: "It's a one-time payment of $5 — lifetime access, no subscription, no renewals, no expiry.",
+      hi: "Sirf $5 ek baar dena hai — lifetime access milta hai, koi monthly charge nahi lagta." },
     { keys: ['phone', 'mobile', 'android', 'ios', 'device', 'mobile me chalega', 'phone me chalega'],
-      a: "Yes! CreatorKit works on any device — phone, tablet, or laptop, right in your browser.<br><br><b>Haan, ye phone, tablet, laptop sab pe chalta hai</b> — bas browser me open karo aur use karo." },
+      en: "Yes! CreatorKit works on any device — phone, tablet, or laptop, right in your browser.",
+      hi: "Haan, ye phone, tablet, laptop sab pe chalta hai — bas browser me open karo aur use karo." },
     { keys: ['trial', 'free try', 'try before', 'free me try', 'free trial'],
-      a: "Yes — the Caption Generator is free to try with no payment required.<br><br><b>Haan, Caption Generator free me try kar sakte ho</b> bina paise diye — quality dekh ke phir decide karo." },
+      en: "Yes — the Caption Generator is free to try with no payment required.",
+      hi: "Haan, Caption Generator free me try kar sakte ho bina paise diye — quality dekh ke phir decide karo." },
     { keys: ['limit', 'unlimited', 'how many times', 'credits', 'cap', 'kitni baar', 'limit hai kya'],
-      a: "Generation is unlimited — no daily limits, no credit system, no caps.<br><br><b>Koi limit nahi hai</b> — jitni baar chaho use kar sakte ho, unlimited." },
+      en: "Generation is unlimited — no daily limits, no credit system, no caps.",
+      hi: "Koi limit nahi hai — jitni baar chaho use kar sakte ho, unlimited." },
     { keys: ['platform', 'instagram', 'youtube', 'tiktok', 'linkedin', 'twitter'],
-      a: "CreatorKit supports Instagram, YouTube, TikTok, LinkedIn, and Twitter/X.<br><br><b>Ye Instagram, YouTube, TikTok, LinkedIn, Twitter/X sab platforms ke liye kaam karta hai.</b>" },
+      en: "CreatorKit supports Instagram, YouTube, TikTok, LinkedIn, and Twitter/X.",
+      hi: "Ye Instagram, YouTube, TikTok, LinkedIn, Twitter/X sab platforms ke liye kaam karta hai." },
     { keys: ['refund', 'money back', 'cancel', 'return', 'paise wapas', 'refund chahiye', 'paisa wapas'],
-      a: "Yes — if you change your mind within 48 hours of paying and haven't generated any content yet, email <a href=\"mailto:pbrammar82@gmail.com\">pbrammar82@gmail.com</a> for a full refund.<br><br><b>Haan, 48 ghante ke andar refund mil sakta hai</b> agar aapne koi tool use nahi kiya ho. Support ko email kar do." },
+      en: "Yes — if you change your mind within 48 hours of paying and haven't generated any content yet, email <a href=\"mailto:pbrammar82@gmail.com\">pbrammar82@gmail.com</a> for a full refund.",
+      hi: "Haan, 48 ghante ke andar refund mil sakta hai agar aapne koi tool use nahi kiya ho. Support ko <a href=\"mailto:pbrammar82@gmail.com\">pbrammar82@gmail.com</a> pe email kar do." },
     { keys: ['login', 'log in', 'sign up', 'signup', 'account', 'password', 'login kaise', 'account kaise banaye'],
-      a: "You can log in or create an account using the Log In / Get Started buttons in the top navigation. Forgot your password? There's a 'Forgot password' link that emails you a reset code.<br><br><b>Login/signup top navigation ke buttons se kar sakte ho.</b> Password bhool gaye ho to 'Forgot password' link use karo." },
+      en: "You can log in or create an account using the Log In / Get Started buttons in the top navigation. Forgot your password? There's a 'Forgot password' link that emails you a reset code.",
+      hi: "Login/signup top navigation ke buttons se kar sakte ho. Password bhool gaye ho to 'Forgot password' link use karo." },
     { keys: ['dark mode', 'light mode', 'theme', 'dark mode kaise', 'light mode kaise'],
-      a: "You can switch between dark and light mode anytime using the ☀️/🌙 toggle in the top navigation or inside your profile menu.<br><br><b>Dark/light mode top navigation ya profile menu ke ☀️/🌙 button se switch kar sakte ho.</b>" },
+      en: "You can switch between dark and light mode anytime using the ☀️/🌙 toggle in the top navigation or inside your profile menu.",
+      hi: "Dark/light mode top navigation ya profile menu ke ☀️/🌙 button se switch kar sakte ho." },
     { keys: ['referral', 'invite', 'discount', 'promo', 'refer kaise', 'invite kaise'],
-      a: "Invite friends to save — every friend who signs up using your referral takes 10% off your unlock, up to 50% off total.<br><br><b>Dost ko invite karo aur discount pao</b> — har signup pe 10% off, max 50% tak." },
-    { keys: ['hi', 'hello', 'hey', 'yo', 'namaste', 'namaskar'],
-      a: "Hey! 👋 I'm the CreatorKit assistant. Ask me anything — pricing, tools, refund, install, ya koi bhi problem, Hindi ya English dono me pooch sakte ho.<br><br><b>Namaste! Main CreatorKit assistant hoon. Kuch bhi pooch sakte ho — Hindi ya English dono chalega.</b>" },
-    { keys: ['thank', 'thanks', 'thx', 'dhanyawad', 'shukriya'],
-      a: "You're welcome! 🙌 <br><br><b>Koi baat nahi! Aur kuch chahiye to bata dena.</b>" },
+      en: "Invite friends to save — every friend who signs up using your referral takes 10% off your unlock, up to 50% off total.",
+      hi: "Dost ko invite karo aur discount pao — har signup pe 10% off, max 50% tak." },
+    { keys: ['hi', 'hello', 'hey', 'yo'],
+      en: "Hey! 👋 I'm the CreatorKit assistant. Ask me anything — pricing, tools, refund, install, or any problem.",
+      hi: "Namaste! Main CreatorKit assistant hoon. Kuch bhi pooch sakte ho — pricing, tools, refund, install, ya koi bhi problem." },
+    { keys: ['namaste', 'namaskar'],
+      en: "Hey! 👋 I'm the CreatorKit assistant. Ask me anything — pricing, tools, refund, install, or any problem.",
+      hi: "Namaste! Main CreatorKit assistant hoon. Kuch bhi pooch sakte ho — pricing, tools, refund, install, ya koi bhi problem." },
+    { keys: ['thank', 'thanks', 'thx'],
+      en: "You're welcome! 🙌 Let me know if there's anything else I can help with.",
+      hi: "Koi baat nahi! 🙌 Aur kuch chahiye to bata dena." },
+    { keys: ['dhanyawad', 'shukriya'],
+      en: "You're welcome! 🙌 Let me know if there's anything else I can help with.",
+      hi: "Koi baat nahi! 🙌 Aur kuch chahiye to bata dena." },
   ];
 
   const INSTALL_KEYS = ['install', 'download app', 'home screen', 'pwa', 'app kaise', 'install kaise', 'app download', 'app kese', 'kese install', 'kaise install', 'app kaise install'];
@@ -7867,7 +7885,22 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
 
   const SUGGESTIONS = ["Install app kaise kare?", "What tools do I get?", "Refund kaise le?", "Mujhe ek problem hai"];
 
+  // Common Hinglish/Hindi words (romanized) used to detect Hindi even without Devanagari script
+  const HINDI_HINTS = ['kaise', 'kya', 'kyu', 'kaha', 'kab', 'kaun', 'kitna', 'kitne', 'hai', 'hain', 'nahi', 'nahin',
+    'mujhe', 'mera', 'meri', 'mere', 'karo', 'kare', 'karna', 'chahiye', 'bata', 'batao', 'paisa', 'paise', 'bhai',
+    'aap', 'tum', 'kaam', 'milega', 'milta', 'sakte', 'sakta', 'chal', 'dikkat', 'samasya', 'shikayat', 'madad',
+    'namaste', 'namaskar', 'dhanyawad', 'shukriya', 'accha', 'theek', 'thik'];
+
+  function detectLanguage(text) {
+    // Devanagari script present -> definitely Hindi
+    if (/[\u0900-\u097F]/.test(text)) return 'hi';
+    const q = ' ' + text.toLowerCase() + ' ';
+    const hits = HINDI_HINTS.filter(w => q.includes(' ' + w + ' ') || q.includes(w)).length;
+    return hits > 0 ? 'hi' : 'en';
+  }
+
   function findAnswer(text) {
+    const lang = detectLanguage(text);
     const q = text.toLowerCase();
     let best = null, bestScore = 0;
     KB.forEach(entry => {
@@ -7878,8 +7911,11 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
         }
       });
     });
-    if (best) return best.a;
-    return "I don't have an exact answer for that — but you can send me the details and I'll pass it straight to our team, or email <a href=\"mailto:pbrammar82@gmail.com\">pbrammar82@gmail.com</a> directly.<br><br><b>Mujhe iska exact jawab nahi pata, lekin aap detail bata do, main hamari team tak pahucha dunga.</b> Ya seedha 'Mujhe problem hai' likh ke bhi bata sakte ho." + reportButtonHtml();
+    if (best) return best[lang];
+    if (lang === 'hi') {
+      return "Mujhe iska exact jawab nahi pata, lekin aap detail bata do, main hamari team tak pahucha dunga. Ya seedha 'Mujhe problem hai' likh ke bhi bata sakte ho." + reportButtonHtml('hi');
+    }
+    return "I don't have an exact answer for that — but you can send me the details and I'll pass it straight to our team, or email <a href=\"mailto:pbrammar82@gmail.com\">pbrammar82@gmail.com</a> directly." + reportButtonHtml('en');
   }
 
   function matchesAny(text, arr) {
@@ -7887,8 +7923,8 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
     return arr.some(k => q.includes(k));
   }
 
-  function reportButtonHtml() {
-    return '<div style="margin-top:10px;"><button class="chat-action-btn" onclick="window.startProblemReport()">📝 Report a problem</button></div>';
+  function reportButtonHtml(lang) {
+    return '<div style="margin-top:10px;"><button class="chat-action-btn" onclick="window.startProblemReport(\'' + (lang || 'en') + '\')">📝 Report a problem</button></div>';
   }
 
   function installButtonHtml() {
@@ -7934,14 +7970,19 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
   // ===== Problem report flow =====
   let awaitingProblemDetails = false;
 
-  window.startProblemReport = function () {
+  window.startProblemReport = function (lang) {
     awaitingProblemDetails = true;
     document.getElementById('chatSuggestions').innerHTML = '';
-    addMsg("Sure — please describe the problem in as much detail as you can (what happened, which page/tool). I'll prepare it to send to our team.<br><br><b>Bata do, problem kya ho rahi hai, kis page ya tool me — main use team tak bhejne ke liye taiyar kar dunga.</b>", 'bot');
+    if (lang === 'hi') {
+      addMsg("Bata do, problem kya ho rahi hai, kis page ya tool me — main use team tak bhejne ke liye taiyar kar dunga.", 'bot');
+    } else {
+      addMsg("Sure — please describe the problem in as much detail as you can (what happened, which page/tool). I'll prepare it to send to our team.", 'bot');
+    }
   };
 
   function handleProblemDetails(text) {
     awaitingProblemDetails = false;
+    const lang = detectLanguage(text);
     const subject = encodeURIComponent('CreatorKit Support — Problem Report');
     const body = encodeURIComponent(
       "Problem reported via website chat assistant:\n\n" + text +
@@ -7949,9 +7990,11 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
       "\nDate: " + new Date().toLocaleString()
     );
     const mailLink = 'mailto:pbrammar82@gmail.com?subject=' + subject + '&body=' + body;
+    const intro = lang === 'hi'
+      ? "Thik hai, detail mil gayi. Neeche button dabao — email app khulega, sab kuch pehle se likha hoga, bas send kar dena, hamari team ko dikh jayega."
+      : "Got it, thanks for the details! 🙏 Tap the button below — it'll open your email app with everything pre-filled, just hit send and our team will see it.";
     addMsg(
-      "Got it, thanks for the details! 🙏 Tap the button below — it'll open your email app with everything pre-filled, just hit send and our team will see it.<br><br><b>Thik hai, detail mil gayi. Neeche button dabao — email app khulega, sab kuch pehle se likha hoga, bas send kar dena, hamari team ko dikh jayega.</b>" +
-      '<div style="margin-top:10px;"><a href="' + mailLink + '" style="display:inline-block;" class="chat-action-btn">📩 Send Problem to Our Team</a></div>',
+      intro + '<div style="margin-top:10px;"><a href="' + mailLink + '" style="display:inline-block;" class="chat-action-btn">📩 Send Problem to Our Team</a></div>',
       'bot'
     );
   }
@@ -7966,7 +8009,7 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
     if (shouldOpen && ping) ping.style.display = 'none';
     if (shouldOpen && !chatStarted) {
       chatStarted = true;
-      addMsg("Hey! 👋 I'm the CreatorKit assistant. Ask me anything — pricing, tools, install, ya koi bhi problem.<br><br><b>Namaste! Hindi ya English, dono me baat kar sakte ho — kuch bhi pooch lo.</b>", 'bot');
+      addMsg("Hey! 👋 I'm the CreatorKit assistant. Ask me anything — pricing, tools, install, or any problem. Hindi ya English, dono me baat kar sakte ho.", 'bot');
       renderSuggestions();
     }
     if (shouldOpen) {
@@ -7976,8 +8019,14 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
 
   let chatHistory = [];
 
+  // IMPORTANT: chat.js lives on your BACKEND project (creatorkit-backend), not this
+  // frontend site — so we must call its full domain, not a relative "/api/chat" path.
+  // If your backend's live domain is different, update the URL below to match
+  // (check Vercel dashboard -> creatorkit-backend project -> Domains).
+  const AI_BACKEND_URL = 'https://creatorkit-backend.vercel.app/api/chat';
+
   async function askAiBackend(text) {
-    const response = await fetch('/api/chat', {
+    const response = await fetch(AI_BACKEND_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text, history: chatHistory })
@@ -8004,22 +8053,24 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
       return;
     }
     if (matchesAny(text, INSTALL_KEYS)) {
+      const lang = detectLanguage(text);
       setTimeout(() => {
         hideTyping();
-        addMsg(
-          "You can install CreatorKit as an app right now — just tap the button below and follow the prompt. It'll then open like a native app from your home screen.<br><br><b>Neeche button dabao, app turant install ho jayega — phir home screen se seedha khul jayega.</b>" + installButtonHtml(),
-          'bot'
-        );
+        const msg = lang === 'hi'
+          ? "Neeche button dabao, app turant install ho jayega — phir home screen se seedha khul jayega."
+          : "You can install CreatorKit as an app right now — just tap the button below and follow the prompt. It'll then open like a native app from your home screen.";
+        addMsg(msg + installButtonHtml(), 'bot');
       }, 500);
       return;
     }
     if (matchesAny(text, PROBLEM_KEYS)) {
+      const lang = detectLanguage(text);
       setTimeout(() => {
         hideTyping();
-        addMsg(
-          "I'm sorry you're running into trouble! Tell me more, or tap below to send it straight to our team.<br><br><b>Koi baat nahi, bata do kya problem ho rahi hai — ya neeche button se seedha hamari team ko bhej do.</b>" + reportButtonHtml(),
-          'bot'
-        );
+        const msg = lang === 'hi'
+          ? "Koi baat nahi, bata do kya problem ho rahi hai — ya neeche button se seedha hamari team ko bhej do."
+          : "I'm sorry you're running into trouble! Tell me more, or tap below to send it straight to our team.";
+        addMsg(msg + reportButtonHtml(lang), 'bot');
       }, 500);
       return;
     }
