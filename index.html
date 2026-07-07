@@ -2981,8 +2981,7 @@
 </style>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://Accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 </head>
 <body>
 
@@ -7835,7 +7834,24 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     return { subtotal, discountAmt, taxAmt, total, sym };
   }
 
-  function downloadInvoice() {
+  function invWrapText(text, font, size, maxWidth) {
+    const words = String(text).split(' ');
+    const lines = [];
+    let cur = '';
+    for (const w of words) {
+      const test = cur ? cur + ' ' + w : w;
+      if (font.widthOfTextAtSize(test, size) > maxWidth && cur) {
+        lines.push(cur);
+        cur = w;
+      } else {
+        cur = test;
+      }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  async function downloadInvoice() {
     const btn = document.getElementById('invoiceBtn');
     const from = document.getElementById('invFrom').value.trim() || 'Your Name / Studio';
     const fromDetails = document.getElementById('invFromDetails').value.trim();
@@ -7863,8 +7879,8 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       return;
     }
 
-    if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
-      alert('PDF library failed to load — check your connection and try again.');
+    if (typeof window.PDFLib === 'undefined') {
+      alert('PDF library failed to load \u2014 check your connection and try again.');
       return;
     }
 
@@ -7873,164 +7889,166 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     btn.textContent = 'Preparing PDF\u2026';
 
     try {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
-      const pageWidth = doc.internal.pageSize.getWidth();
+      const { PDFDocument, rgb, StandardFonts } = window.PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([595.28, 841.89]); // A4
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const { width: pageWidth, height: pageHeight } = page.getSize();
       const marginX = 48;
-      const y0 = 56;
-      const logo = window._ckInvoiceLogo;
+      const fromTop = (yTop) => pageHeight - yTop;
+      const black = rgb(0.08, 0.08, 0.08);
+      const gray = rgb(0.35, 0.35, 0.35);
+      const lightGray = rgb(0.6, 0.6, 0.6);
+      const lineGray = rgb(0.88, 0.88, 0.86);
 
-      let logoH = 0;
-      if (logo) {
+      let y = 70;
+      let logoImg = null, logoDims = null;
+      const logoDataUrl = window._ckInvoiceLogo;
+
+      if (logoDataUrl) {
         try {
-          const props = doc.getImageProperties(logo);
+          const res = await fetch(logoDataUrl);
+          const bytes = await res.arrayBuffer();
+          logoImg = logoDataUrl.startsWith('data:image/png')
+            ? await pdfDoc.embedPng(bytes)
+            : await pdfDoc.embedJpg(bytes);
           const maxW = 110, maxH = 46;
-          let w = maxW, h = (props.height / props.width) * maxW;
-          if (h > maxH) { h = maxH; w = (props.width / props.height) * maxH; }
-          doc.addImage(logo, props.fileType || 'PNG', marginX, y0, w, h);
-          logoH = h;
-        } catch (e) { /* ignore bad image data */ }
+          let w = maxW, h = (logoImg.height / logoImg.width) * maxW;
+          if (h > maxH) { h = maxH; w = (logoImg.width / logoImg.height) * maxH; }
+          logoDims = { w, h };
+          page.drawImage(logoImg, { x: marginX, y: fromTop(y - 4 + h), width: w, height: h });
+          y += h + 14;
+        } catch (e) { /* bad/unsupported image data, skip logo */ }
       }
 
-      const fromNameY = y0 + (logoH ? logoH + 16 : 8);
+      page.drawText(from, { x: marginX, y: fromTop(y), size: 13, font: fontBold, color: black });
+      const invoiceTitleW = fontBold.widthOfTextAtSize('INVOICE', 22);
+      page.drawText('INVOICE', { x: pageWidth - marginX - invoiceTitleW, y: fromTop(70 - 4), size: 22, font: fontBold, color: black });
+      const numberW = font.widthOfTextAtSize(number, 9.5);
+      page.drawText(number, { x: pageWidth - marginX - numberW, y: fromTop(70 + 12), size: 9.5, font, color: gray });
 
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(13);
-      doc.setTextColor(20, 20, 20);
-      doc.text(from, marginX, fromNameY);
-
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(22);
-      doc.text('INVOICE', pageWidth - marginX, y0 + 10, { align: 'right' });
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9.5);
-      doc.setTextColor(100, 100, 100);
-      doc.text(number, pageWidth - marginX, y0 + 26, { align: 'right' });
-
-      let fromY = fromNameY + 14;
+      y += 18;
       if (fromDetails) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(90, 90, 90);
-        const lines = doc.splitTextToSize(fromDetails, 260);
-        doc.text(lines, marginX, fromY);
-        fromY += lines.length * 11;
+        fromDetails.split('\n').forEach(line => {
+          page.drawText(line, { x: marginX, y: fromTop(y), size: 9, font, color: gray });
+          y += 12;
+        });
       }
 
-      const headerBottom = Math.max(fromY, y0 + 46) + 10;
-      doc.setDrawColor(20, 20, 20);
-      doc.setLineWidth(1.4);
-      doc.line(marginX, headerBottom, pageWidth - marginX, headerBottom);
+      const headerBottom = Math.max(y, 90) + 8;
+      page.drawLine({ start: { x: marginX, y: fromTop(headerBottom) }, end: { x: pageWidth - marginX, y: fromTop(headerBottom) }, thickness: 1.4, color: black });
 
       const by = headerBottom + 26;
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text('BILL TO', marginX, by);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(20, 20, 20);
-      doc.text(to, marginX, by + 14);
-
+      page.drawText('BILL TO', { x: marginX, y: fromTop(by), size: 8, font, color: lightGray });
+      page.drawText(to, { x: marginX, y: fromTop(by + 14), size: 11, font: fontBold, color: black });
       let toY = by + 14;
       if (toDetails) {
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(90, 90, 90);
-        const lines = doc.splitTextToSize(toDetails, 240);
-        doc.text(lines, marginX, toY + 14);
-        toY += 14 + lines.length * 11;
+        toDetails.split('\n').forEach(line => {
+          toY += 12;
+          page.drawText(line, { x: marginX, y: fromTop(toY), size: 9, font, color: gray });
+        });
       }
 
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(150, 150, 150);
-      doc.text('Issue date', pageWidth - marginX - 130, by);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(20, 20, 20);
-      doc.text(date, pageWidth - marginX, by, { align: 'right' });
+      page.drawText('Issue date', { x: pageWidth - marginX - 130, y: fromTop(by), size: 9, font, color: lightGray });
+      const dateW = fontBold.widthOfTextAtSize(date, 9);
+      page.drawText(date, { x: pageWidth - marginX - dateW, y: fromTop(by), size: 9, font: fontBold, color: black });
 
       if (dueDate) {
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(150, 150, 150);
-        doc.text('Due date', pageWidth - marginX - 130, by + 16);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(20, 20, 20);
-        doc.text(dueDate, pageWidth - marginX, by + 16, { align: 'right' });
+        page.drawText('Due date', { x: pageWidth - marginX - 130, y: fromTop(by + 16), size: 9, font, color: lightGray });
+        const dueW = fontBold.widthOfTextAtSize(dueDate, 9);
+        page.drawText(dueDate, { x: pageWidth - marginX - dueW, y: fromTop(by + 16), size: 9, font: fontBold, color: black });
       }
 
       const tableStartY = Math.max(toY, by + 30) + 24;
+      const colQtyW = 50, colRateW = 80, colAmtW = 80;
+      const tableWidth = pageWidth - marginX * 2;
+      const descW = tableWidth - colQtyW - colRateW - colAmtW;
+      const qtyX = marginX + descW;
+      const rateX = qtyX + colQtyW;
+      const amtX = rateX + colRateW;
 
-      doc.autoTable({
-        startY: tableStartY,
-        margin: { left: marginX, right: marginX },
-        head: [['Description', 'Qty', 'Rate', 'Amount']],
-        body: items,
-        theme: 'plain',
-        styles: { font: 'helvetica', fontSize: 9.5, textColor: [30, 30, 30], cellPadding: { top: 8, bottom: 8, left: 6, right: 6 } },
-        headStyles: { textColor: [20, 20, 20], fontStyle: 'bold', lineWidth: { bottom: 1.2 }, lineColor: [20, 20, 20] },
-        bodyStyles: { lineWidth: { bottom: 0.5 }, lineColor: [225, 225, 220] },
-        columnStyles: {
-          0: { halign: 'left', cellWidth: 'auto' },
-          1: { halign: 'center', cellWidth: 50 },
-          2: { halign: 'right', cellWidth: 80 },
-          3: { halign: 'right', cellWidth: 80 }
-        }
+      page.drawText('DESCRIPTION', { x: marginX, y: fromTop(tableStartY), size: 8.5, font: fontBold, color: black });
+      const qtyHdrW = fontBold.widthOfTextAtSize('QTY', 8.5);
+      page.drawText('QTY', { x: qtyX + colQtyW / 2 - qtyHdrW / 2, y: fromTop(tableStartY), size: 8.5, font: fontBold, color: black });
+      const rateHdrW = fontBold.widthOfTextAtSize('RATE', 8.5);
+      page.drawText('RATE', { x: rateX + colRateW - rateHdrW, y: fromTop(tableStartY), size: 8.5, font: fontBold, color: black });
+      const amtHdrW = fontBold.widthOfTextAtSize('AMOUNT', 8.5);
+      page.drawText('AMOUNT', { x: amtX + colAmtW - amtHdrW, y: fromTop(tableStartY), size: 8.5, font: fontBold, color: black });
+      page.drawLine({ start: { x: marginX, y: fromTop(tableStartY + 6) }, end: { x: pageWidth - marginX, y: fromTop(tableStartY + 6) }, thickness: 1.2, color: black });
+
+      let rowY = tableStartY + 24;
+      items.forEach(([desc, qty, rate, amt]) => {
+        const lines = invWrapText(desc, font, 9.5, descW - 10);
+        lines.forEach((line, i) => {
+          page.drawText(line, { x: marginX, y: fromTop(rowY + i * 12), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
+        });
+        const qtyW = font.widthOfTextAtSize(qty, 9.5);
+        page.drawText(qty, { x: qtyX + colQtyW / 2 - qtyW / 2, y: fromTop(rowY), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
+        const rateW = font.widthOfTextAtSize(rate, 9.5);
+        page.drawText(rate, { x: rateX + colRateW - rateW, y: fromTop(rowY), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
+        const amtW = fontBold.widthOfTextAtSize(amt, 9.5);
+        page.drawText(amt, { x: amtX + colAmtW - amtW, y: fromTop(rowY), size: 9.5, font: fontBold, color: rgb(0.12, 0.12, 0.12) });
+        const rowH = Math.max(lines.length * 12, 16);
+        rowY += rowH + 8;
+        page.drawLine({ start: { x: marginX, y: fromTop(rowY - 4) }, end: { x: pageWidth - marginX, y: fromTop(rowY - 4) }, thickness: 0.5, color: lineGray });
       });
 
-      let sy = doc.lastAutoTable.finalY + 20;
+      let sy = rowY + 16;
       const sumX1 = pageWidth - marginX - 200;
       const sumX2 = pageWidth - marginX;
 
-      const summaryLine = (label, value, bold) => {
-        doc.setFont('helvetica', bold ? 'bold' : 'normal');
-        doc.setFontSize(bold ? 11.5 : 9.5);
-        const c = bold ? 20 : 90;
-        doc.setTextColor(c, c, c);
-        doc.text(label, sumX1, sy);
-        doc.text(value, sumX2, sy, { align: 'right' });
+      function summaryLine(label, value, bold) {
+        const f = bold ? fontBold : font;
+        const size = bold ? 11.5 : 9.5;
+        const color = bold ? black : gray;
+        page.drawText(label, { x: sumX1, y: fromTop(sy), size, font: f, color });
+        const w = f.widthOfTextAtSize(value, size);
+        page.drawText(value, { x: sumX2 - w, y: fromTop(sy), size, font: f, color });
         sy += bold ? 18 : 15;
-      };
+      }
 
       summaryLine('Subtotal', `${sym}${subtotal.toFixed(2)}`, false);
       if (discountPct > 0) summaryLine(`Discount (${discountPct}%)`, `-${sym}${discountAmt.toFixed(2)}`, false);
       if (taxPct > 0) summaryLine(`Tax (${taxPct}%)`, `${sym}${taxAmt.toFixed(2)}`, false);
-      doc.setDrawColor(20, 20, 20);
-      doc.setLineWidth(1);
-      doc.line(sumX1, sy - 6, sumX2, sy - 6);
+      page.drawLine({ start: { x: sumX1, y: fromTop(sy - 6) }, end: { x: sumX2, y: fromTop(sy - 6) }, thickness: 1, color: black });
       summaryLine('Total', `${sym}${total.toFixed(2)}`, true);
 
       if (notes) {
         sy += 20;
-        doc.setDrawColor(230, 230, 225);
-        doc.setLineWidth(0.6);
-        doc.line(marginX, sy, pageWidth - marginX, sy);
+        page.drawLine({ start: { x: marginX, y: fromTop(sy) }, end: { x: pageWidth - marginX, y: fromTop(sy) }, thickness: 0.6, color: lineGray });
         sy += 16;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(90, 90, 90);
-        const noteLines = doc.splitTextToSize(notes, pageWidth - marginX * 2);
-        doc.text(noteLines, marginX, sy);
+        const noteLines = invWrapText(notes, font, 9, pageWidth - marginX * 2);
+        noteLines.forEach((line, i) => {
+          page.drawText(line, { x: marginX, y: fromTop(sy + i * 12), size: 9, font, color: gray });
+        });
       }
 
-      const pageH = doc.internal.pageSize.getHeight();
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.setTextColor(180, 180, 180);
-      doc.text('Generated with CreatorKit \u2014 creatorkitapp.vercel.app', pageWidth / 2, pageH - 28, { align: 'center' });
+      const footerText = 'Generated with CreatorKit \u2014 creatorkitapp.vercel.app';
+      const footerW = font.widthOfTextAtSize(footerText, 8);
+      page.drawText(footerText, { x: (pageWidth - footerW) / 2, y: 28, size: 8, font, color: rgb(0.75, 0.75, 0.75) });
 
-      doc.save(`${number}.pdf`);
+      const bytes = await pdfDoc.save();
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
 
       try {
         localStorage.setItem('ck_invoice_profile', JSON.stringify({
-          from, fromDetails, currency: document.getElementById('invCurrency').value, logo: logo || null
+          from, fromDetails, currency: document.getElementById('invCurrency').value, logo: logoDataUrl || null
         }));
         const seq = parseInt(localStorage.getItem('ck_invoice_seq') || '0', 10) + 1;
         localStorage.setItem('ck_invoice_seq', String(seq));
       } catch (e) {}
     } catch (err) {
-      console.error(err);
-      alert('Something went wrong generating the PDF. Please try again.');
+      console.error('Invoice PDF generation failed:', err);
+      alert('Something went wrong generating the PDF: ' + (err && err.message ? err.message : 'unknown error'));
     } finally {
       btn.disabled = false;
       btn.textContent = originalLabel;
