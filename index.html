@@ -1323,19 +1323,6 @@
   }
   .invoice-row-del:hover { color: var(--coral); }
 
-  .inv-pdf-overlay {
-    position: fixed; inset: 0; z-index: 99999;
-    background: var(--bg); color: var(--text);
-    display: flex; align-items: center; justify-content: center; gap: 12px;
-    font-family: 'Inter', sans-serif; font-size: 0.95rem;
-  }
-  .inv-pdf-spinner {
-    width: 20px; height: 20px; border-radius: 50%;
-    border: 2.5px solid var(--border); border-top-color: var(--lime);
-    animation: invPdfSpin 0.7s linear infinite;
-  }
-  @keyframes invPdfSpin { to { transform: rotate(360deg); } }
-
   .inv-summary { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 10px; }
   .inv-summary-row {
     display: flex; justify-content: space-between; padding: 5px 0;
@@ -2994,7 +2981,8 @@
 </style>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://Accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -7861,120 +7849,178 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     const taxPct = parseFloat(document.getElementById('invTax').value) || 0;
     const { subtotal, discountAmt, taxAmt, total, sym } = updateInvoiceTotal();
 
-    let rowsHtml = '';
+    const items = [];
     document.querySelectorAll('#invoiceRows .inv-item').forEach(row => {
       const desc = row.querySelector('.inv-item-desc').value.trim();
       const qty = parseFloat(row.querySelector('.inv-item-qty').value) || 0;
       const rate = parseFloat(row.querySelector('.inv-item-rate').value) || 0;
       if (!desc && qty === 0 && rate === 0) return;
-      rowsHtml += `<tr>
-        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;">${desc || '—'}</td>
-        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;text-align:center;">${qty}</td>
-        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;text-align:right;">${sym}${rate.toFixed(2)}</td>
-        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;text-align:right;font-weight:600;">${sym}${(qty * rate).toFixed(2)}</td>
-      </tr>`;
+      items.push([desc || '\u2014', String(qty), `${sym}${rate.toFixed(2)}`, `${sym}${(qty * rate).toFixed(2)}`]);
     });
 
-    if (!rowsHtml) {
+    if (!items.length) {
       alert('Add at least one item with a description or amount before downloading.');
       return;
     }
 
-    const logo = window._ckInvoiceLogo;
-
-    const template = document.createElement('div');
-    // NOTE: html2canvas cannot reliably capture elements positioned at negative
-    // coordinates (it crops a blank region) — so we render this on-screen at (0,0)
-    // and cover it with a loading overlay instead of pushing it off-screen.
-    template.style.cssText = 'position:absolute;top:0;left:0;width:760px;background:#ffffff;color:#111;font-family:Arial,Helvetica,sans-serif;padding:52px;z-index:9998;';
-    template.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:20px;">
-        <div>
-          ${logo ? `<img src="${logo}" style="max-height:52px;max-width:160px;margin-bottom:10px;display:block;" />` : ''}
-          <div style="font-size:1.4rem;font-weight:700;">${from}</div>
-          ${fromDetails ? `<div style="color:#555;font-size:0.85rem;margin-top:4px;white-space:pre-line;">${fromDetails}</div>` : ''}
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:1.8rem;font-weight:800;letter-spacing:0.05em;color:#111;">INVOICE</div>
-          <div style="color:#555;font-size:0.85rem;margin-top:6px;">${number}</div>
-        </div>
-      </div>
-
-      <div style="display:flex;justify-content:space-between;margin-top:28px;">
-        <div>
-          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;margin-bottom:4px;">Bill to</div>
-          <div style="font-weight:700;font-size:1.02rem;">${to}</div>
-          ${toDetails ? `<div style="color:#555;font-size:0.85rem;margin-top:2px;white-space:pre-line;">${toDetails}</div>` : ''}
-        </div>
-        <div style="text-align:right;">
-          <div style="margin-bottom:8px;"><span style="color:#999;font-size:0.8rem;">Issue date&nbsp;&nbsp;</span><strong>${date}</strong></div>
-          ${dueDate ? `<div><span style="color:#999;font-size:0.8rem;">Due date&nbsp;&nbsp;</span><strong>${dueDate}</strong></div>` : ''}
-        </div>
-      </div>
-
-      <table style="width:100%;border-collapse:collapse;margin-top:32px;">
-        <thead>
-          <tr>
-            <th style="text-align:left;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Description</th>
-            <th style="text-align:center;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Qty</th>
-            <th style="text-align:right;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Rate</th>
-            <th style="text-align:right;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Amount</th>
-          </tr>
-        </thead>
-        <tbody>${rowsHtml}</tbody>
-      </table>
-
-      <div style="display:flex;justify-content:flex-end;margin-top:20px;">
-        <div style="width:260px;">
-          <div style="display:flex;justify-content:space-between;padding:6px 0;color:#444;font-size:0.9rem;"><span>Subtotal</span><span>${sym}${subtotal.toFixed(2)}</span></div>
-          ${discountPct > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;color:#444;font-size:0.9rem;"><span>Discount (${discountPct}%)</span><span>-${sym}${discountAmt.toFixed(2)}</span></div>` : ''}
-          ${taxPct > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;color:#444;font-size:0.9rem;"><span>Tax (${taxPct}%)</span><span>${sym}${taxAmt.toFixed(2)}</span></div>` : ''}
-          <div style="display:flex;justify-content:space-between;padding:12px 0 0;margin-top:6px;border-top:2px solid #111;font-weight:800;font-size:1.15rem;"><span>Total</span><span>${sym}${total.toFixed(2)}</span></div>
-        </div>
-      </div>
-
-      ${notes ? `<div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e5e0;color:#555;font-size:0.85rem;white-space:pre-line;">${notes}</div>` : ''}
-
-      <div style="margin-top:48px;text-align:center;color:#bbb;font-size:0.7rem;">Generated with CreatorKit — creatorkitapp.vercel.app</div>
-    `;
-    document.body.appendChild(template);
-
-    const overlay = document.createElement('div');
-    overlay.className = 'inv-pdf-overlay';
-    overlay.innerHTML = `<div class="inv-pdf-spinner"></div><span>Preparing your invoice…</span>`;
-    document.body.appendChild(overlay);
-
-    const originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Preparing PDF…';
-
-    const finish = () => {
-      template.remove();
-      overlay.remove();
-      btn.disabled = false;
-      btn.textContent = originalLabel;
-    };
-
-    if (typeof html2pdf === 'undefined') {
-      // fallback if the PDF library failed to load (offline, blocked script, etc.)
-      finish();
-      const win = window.open('', '_blank');
-      win.document.write(`<html><head><title>Invoice ${number}</title></head><body>${template.innerHTML}<script>window.onload=()=>setTimeout(()=>window.print(),250);<\/script></body></html>`);
-      win.document.close();
+    if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+      alert('PDF library failed to load — check your connection and try again.');
       return;
     }
 
-    html2pdf().set({
-      margin: 0,
-      filename: `${number}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0, x: 0, y: 0,
-        ignoreElements: (el) => el.classList && el.classList.contains('inv-pdf-overlay')
-      },
-      jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
-    }).from(template).save().then(() => {
-      finish();
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Preparing PDF\u2026';
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const marginX = 48;
+      const y0 = 56;
+      const logo = window._ckInvoiceLogo;
+
+      let logoH = 0;
+      if (logo) {
+        try {
+          const props = doc.getImageProperties(logo);
+          const maxW = 110, maxH = 46;
+          let w = maxW, h = (props.height / props.width) * maxW;
+          if (h > maxH) { h = maxH; w = (props.width / props.height) * maxH; }
+          doc.addImage(logo, props.fileType || 'PNG', marginX, y0, w, h);
+          logoH = h;
+        } catch (e) { /* ignore bad image data */ }
+      }
+
+      const fromNameY = y0 + (logoH ? logoH + 16 : 8);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(20, 20, 20);
+      doc.text(from, marginX, fromNameY);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('INVOICE', pageWidth - marginX, y0 + 10, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(100, 100, 100);
+      doc.text(number, pageWidth - marginX, y0 + 26, { align: 'right' });
+
+      let fromY = fromNameY + 14;
+      if (fromDetails) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90, 90, 90);
+        const lines = doc.splitTextToSize(fromDetails, 260);
+        doc.text(lines, marginX, fromY);
+        fromY += lines.length * 11;
+      }
+
+      const headerBottom = Math.max(fromY, y0 + 46) + 10;
+      doc.setDrawColor(20, 20, 20);
+      doc.setLineWidth(1.4);
+      doc.line(marginX, headerBottom, pageWidth - marginX, headerBottom);
+
+      const by = headerBottom + 26;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text('BILL TO', marginX, by);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(20, 20, 20);
+      doc.text(to, marginX, by + 14);
+
+      let toY = by + 14;
+      if (toDetails) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90, 90, 90);
+        const lines = doc.splitTextToSize(toDetails, 240);
+        doc.text(lines, marginX, toY + 14);
+        toY += 14 + lines.length * 11;
+      }
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(150, 150, 150);
+      doc.text('Issue date', pageWidth - marginX - 130, by);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(20, 20, 20);
+      doc.text(date, pageWidth - marginX, by, { align: 'right' });
+
+      if (dueDate) {
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(150, 150, 150);
+        doc.text('Due date', pageWidth - marginX - 130, by + 16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(20, 20, 20);
+        doc.text(dueDate, pageWidth - marginX, by + 16, { align: 'right' });
+      }
+
+      const tableStartY = Math.max(toY, by + 30) + 24;
+
+      doc.autoTable({
+        startY: tableStartY,
+        margin: { left: marginX, right: marginX },
+        head: [['Description', 'Qty', 'Rate', 'Amount']],
+        body: items,
+        theme: 'plain',
+        styles: { font: 'helvetica', fontSize: 9.5, textColor: [30, 30, 30], cellPadding: { top: 8, bottom: 8, left: 6, right: 6 } },
+        headStyles: { textColor: [20, 20, 20], fontStyle: 'bold', lineWidth: { bottom: 1.2 }, lineColor: [20, 20, 20] },
+        bodyStyles: { lineWidth: { bottom: 0.5 }, lineColor: [225, 225, 220] },
+        columnStyles: {
+          0: { halign: 'left', cellWidth: 'auto' },
+          1: { halign: 'center', cellWidth: 50 },
+          2: { halign: 'right', cellWidth: 80 },
+          3: { halign: 'right', cellWidth: 80 }
+        }
+      });
+
+      let sy = doc.lastAutoTable.finalY + 20;
+      const sumX1 = pageWidth - marginX - 200;
+      const sumX2 = pageWidth - marginX;
+
+      const summaryLine = (label, value, bold) => {
+        doc.setFont('helvetica', bold ? 'bold' : 'normal');
+        doc.setFontSize(bold ? 11.5 : 9.5);
+        const c = bold ? 20 : 90;
+        doc.setTextColor(c, c, c);
+        doc.text(label, sumX1, sy);
+        doc.text(value, sumX2, sy, { align: 'right' });
+        sy += bold ? 18 : 15;
+      };
+
+      summaryLine('Subtotal', `${sym}${subtotal.toFixed(2)}`, false);
+      if (discountPct > 0) summaryLine(`Discount (${discountPct}%)`, `-${sym}${discountAmt.toFixed(2)}`, false);
+      if (taxPct > 0) summaryLine(`Tax (${taxPct}%)`, `${sym}${taxAmt.toFixed(2)}`, false);
+      doc.setDrawColor(20, 20, 20);
+      doc.setLineWidth(1);
+      doc.line(sumX1, sy - 6, sumX2, sy - 6);
+      summaryLine('Total', `${sym}${total.toFixed(2)}`, true);
+
+      if (notes) {
+        sy += 20;
+        doc.setDrawColor(230, 230, 225);
+        doc.setLineWidth(0.6);
+        doc.line(marginX, sy, pageWidth - marginX, sy);
+        sy += 16;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90, 90, 90);
+        const noteLines = doc.splitTextToSize(notes, pageWidth - marginX * 2);
+        doc.text(noteLines, marginX, sy);
+      }
+
+      const pageH = doc.internal.pageSize.getHeight();
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(180, 180, 180);
+      doc.text('Generated with CreatorKit \u2014 creatorkitapp.vercel.app', pageWidth / 2, pageH - 28, { align: 'center' });
+
+      doc.save(`${number}.pdf`);
+
       try {
         localStorage.setItem('ck_invoice_profile', JSON.stringify({
           from, fromDetails, currency: document.getElementById('invCurrency').value, logo: logo || null
@@ -7982,10 +8028,13 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
         const seq = parseInt(localStorage.getItem('ck_invoice_seq') || '0', 10) + 1;
         localStorage.setItem('ck_invoice_seq', String(seq));
       } catch (e) {}
-    }).catch(() => {
-      finish();
+    } catch (err) {
+      console.error(err);
       alert('Something went wrong generating the PDF. Please try again.');
-    });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
   }
 
   // ===== SCREENSHOT BEAUTIFIER (free, client-side canvas) =====
