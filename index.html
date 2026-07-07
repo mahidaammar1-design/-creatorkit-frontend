@@ -815,6 +815,74 @@
     margin-bottom: 24px;
   }
 
+  /* COMPARISON BOX — eye-catching animated version */
+  .compare-box {
+    position: relative;
+    margin-top: 28px;
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 2px;
+    overflow: hidden;
+    background: linear-gradient(120deg, var(--border), var(--border));
+  }
+
+  .compare-box::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 16px;
+    background: conic-gradient(from 0deg, var(--lime), #7c6fff, var(--coral), var(--lime));
+    animation: compareBorderSpin 4s linear infinite;
+    z-index: 0;
+  }
+
+  .compare-box-inner {
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+
+  @keyframes compareBorderSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  .compare-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+  }
+
+  .compare-row + .compare-row {
+    border-top: 1px solid var(--border);
+  }
+
+  .compare-row.win {
+    animation: compareWinPulse 2.2s ease-in-out infinite;
+    border-radius: 10px;
+    margin: 4px -10px;
+    padding: 12px 10px;
+  }
+
+  @keyframes compareWinPulse {
+    0%, 100% { background: rgba(var(--lime-rgb), 0.06); }
+    50% { background: rgba(var(--lime-rgb), 0.16); }
+  }
+
+  .compare-label {
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  .compare-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
   .math-strip {
     display: flex;
     align-items: center;
@@ -2815,26 +2883,21 @@
       </div>
       <div class="hero-note">// one-time payment · no subscription · no expiry</div>
 
-      <!-- Social Proof Bar -->
+      <!-- Honest launch badge -->
       <div style="display:flex;align-items:center;gap:14px;margin-top:24px;flex-wrap:wrap;animation:fadeInUp 0.5s ease 0.1s both;">
-        <div style="display:flex;">
-          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#d4ff3f,#8ab000);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:#0e0e12;margin-right:-8px;z-index:4;">P</div>
-          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ff5a5f,#cc3030);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:white;margin-right:-8px;z-index:3;">A</div>
-          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7c6fff,#4a3fbf);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.75rem;color:white;margin-right:-8px;z-index:2;">R</div>
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-2);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:var(--muted);z-index:1;">+</div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border:1px solid var(--border);border-radius:999px;font-size:0.85rem;">
+          <span style="position:relative;width:8px;height:8px;flex-shrink:0;">
+            <span style="position:absolute;inset:0;background:var(--lime);border-radius:50%;"></span>
+            <span style="position:absolute;inset:0;background:var(--lime);border-radius:50%;animation:liveDotPing 1.6s ease-out infinite;"></span>
+          </span>
+          <span style="color:var(--text);font-weight:600;">🚀 Just launched — be one of our first creators</span>
         </div>
-        <div class="star-row" style="display:flex;gap:2px;color:#f5a623;font-size:0.9rem;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-        <div style="font-size:0.85rem;color:var(--muted);">Loved by <strong style="color:var(--text);">11,200+</strong> creators</div>
       </div>
 
-      <!-- LIVE COUNTER -->
+      <!-- No-signup demo callout -->
       <div id="liveCounterBadge" style="display:inline-flex;align-items:center;gap:9px;margin-top:16px;padding:9px 16px;background:var(--surface);border:1px solid var(--border);border-radius:999px;animation:fadeInUp 0.5s ease 0.2s both;">
-        <span style="position:relative;width:8px;height:8px;flex-shrink:0;">
-          <span style="position:absolute;inset:0;background:var(--coral);border-radius:50%;"></span>
-          <span style="position:absolute;inset:0;background:var(--coral);border-radius:50%;animation:liveDotPing 1.6s ease-out infinite;"></span>
-        </span>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);letter-spacing:0.3px;">
-          <strong id="liveCounterNum" style="color:var(--text);font-weight:700;">0</strong> tools generated today
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text);letter-spacing:0.3px;font-weight:600;">
+          ⚡ Try the caption generator free — no signup needed
         </span>
       </div>
     </div>
@@ -2858,68 +2921,37 @@
   <div class="ticker" id="tickerEl"></div>
 </div>
 
-<!-- MINI REVIEWS STRIP -->
+<!-- WHY WE BUILT THIS -->
 <section style="padding: 52px 0 0;">
   <div class="wrap">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:28px;">
       <div style="flex:1;height:1px;background:var(--border);"></div>
-      <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted-2);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;">what creators say</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted-2);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;">why we built this</span>
       <div style="flex:1;height:1px;background:var(--border);"></div>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
 
-      <!-- Review 1 -->
-      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:13px;align-items:flex-start;">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f9a8d4,#ec4899);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👩</div>
-        <div>
-          <div class="star-row" style="display:flex;gap:2px;color:#f5a623;font-size:0.75rem;margin-bottom:5px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-          <p style="font-size:0.84rem;line-height:1.55;color:var(--text);margin-bottom:7px;">"Hook generator saved me hours. My reels actually stop people now."</p>
-          <div style="font-size:0.76rem;color:var(--muted);font-weight:600;">Sneha R. <span style="font-weight:400;">· Lifestyle · 38k</span></div>
-        </div>
+      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:1.4rem;margin-bottom:8px;">⚡</div>
+        <p style="font-size:0.84rem;line-height:1.55;color:var(--text);">No more staring at a blank caption box for 20 minutes. Type a topic, get 5 options instantly.</p>
       </div>
 
-      <!-- Review 2 -->
-      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:13px;align-items:flex-start;">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#93c5fd,#3b82f6);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🧑</div>
-        <div>
-          <div class="star-row" style="display:flex;gap:2px;color:#f5a623;font-size:0.75rem;margin-bottom:5px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-          <p style="font-size:0.84rem;line-height:1.55;color:var(--text);margin-bottom:7px;">"$5 for lifetime access? I use this every single day. Insane value."</p>
-          <div style="font-size:0.76rem;color:var(--muted);font-weight:600;">Arjun M. <span style="font-weight:400;">· Finance · 28k YouTube</span></div>
-        </div>
+      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:1.4rem;margin-bottom:8px;">💸</div>
+        <p style="font-size:0.84rem;line-height:1.55;color:var(--text);">One $5 payment, not another $10/month subscription you forget to cancel.</p>
       </div>
 
-      <!-- Review 3 -->
-      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:13px;align-items:flex-start;">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#86efac,#22c55e);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">👩</div>
-        <div>
-          <div class="star-row" style="display:flex;gap:2px;color:#f5a623;font-size:0.75rem;margin-bottom:5px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-          <p style="font-size:0.84rem;line-height:1.55;color:var(--text);margin-bottom:7px;">"Caption tool is 🔥 — gives me 5 options with different vibes instantly."</p>
-          <div style="font-size:0.76rem;color:var(--muted);font-weight:600;">Riya K. <span style="font-weight:400;">· Fashion · 67k Instagram</span></div>
-        </div>
+      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🧰</div>
+        <p style="font-size:0.84rem;line-height:1.55;color:var(--text);">19 tools in one place instead of switching between five different apps.</p>
       </div>
 
-      <!-- Review 4 -->
-      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:13px;align-items:flex-start;">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fcd34d,#f59e0b);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🧔</div>
-        <div>
-          <div class="star-row" style="display:flex;gap:2px;color:#f5a623;font-size:0.75rem;margin-bottom:5px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-          <p style="font-size:0.84rem;line-height:1.55;color:var(--text);margin-bottom:7px;">"Content calendar alone is worth it. Never blank on ideas anymore."</p>
-          <div style="font-size:0.76rem;color:var(--muted);font-weight:600;">Karan S. <span style="font-weight:400;">· Tech · 19k YouTube</span></div>
-        </div>
+      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
+        <div style="font-size:1.4rem;margin-bottom:8px;">🆕</div>
+        <p style="font-size:0.84rem;line-height:1.55;color:var(--text);">We just launched — try the caption generator free below, no signup needed.</p>
       </div>
 
-    </div>
-
-    <!-- Rating badge -->
-    <div style="display:flex;justify-content:center;margin-top:24px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:8px 20px;display:inline-flex;align-items:center;gap:14px;font-size:0.84rem;flex-wrap:wrap;justify-content:center;">
-        <span style="display:flex;align-items:center;gap:5px;font-weight:700;"><span style="color:#f5a623;">★</span> 4.9</span>
-        <span style="width:1px;height:16px;background:var(--border);"></span>
-        <span style="color:var(--muted);">Trusted by <strong style="color:var(--text);">11,200+</strong> creators</span>
-        <span style="width:1px;height:16px;background:var(--border);"></span>
-        <span style="color:var(--muted);"><strong id="lifetimeToolsNum" style="color:var(--text);">0</strong> tools generated all-time</span>
-      </div>
     </div>
   </div>
 </section>
@@ -3262,14 +3294,16 @@
         <h3>Less than one coffee.<br>Used every single day.</h3>
         <p>Other apps charge $6/month forever. CreatorKit is a one-time payment — 19 tools, no expiry, new tools added free. Open it whenever you need it.</p>
 
-        <div style="margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:0.85rem;color:var(--muted);">Typical AI subscription</span>
-            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--muted);text-decoration:line-through;">$6-15/mo</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
-            <span style="font-size:0.85rem;color:var(--text);font-weight:600;">CreatorKit, forever</span>
-            <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--lime);">$5 once</span>
+        <div class="compare-box">
+          <div class="compare-box-inner">
+            <div class="compare-row">
+              <span class="compare-label">Typical AI subscription</span>
+              <span class="compare-value" style="color:var(--text);text-decoration:line-through;opacity:0.6;">$6-15/mo</span>
+            </div>
+            <div class="compare-row win">
+              <span class="compare-label">CreatorKit, forever</span>
+              <span class="compare-value" style="color:var(--lime);">$5 once</span>
+            </div>
           </div>
         </div>
       </div>
@@ -3281,47 +3315,15 @@
 <section class="section" style="padding-bottom:20px;">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">// what creators say</div>
-      <h2>Loved by 11,200+ creators.</h2>
+      <div class="section-eyebrow">// just launched</div>
+      <h2>Be one of our first reviewers.</h2>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
-
-      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;">
-        <div class="star-row" style="display:flex;gap:4px;margin-bottom:14px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-        <p style="font-size:0.92rem;line-height:1.6;color:var(--text);margin-bottom:16px;">"I used to spend 45 minutes writing captions and hooks. Now I do it in under 2 minutes. The hook generator alone is worth it."</p>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:36px;height:36px;background:linear-gradient(135deg,#d4ff3f,#8ab000);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:#0e0e12;">P</div>
-          <div><div style="font-weight:600;font-size:0.88rem;">Priya S.</div><div style="font-size:0.78rem;color:var(--muted);">Fashion creator · 42k followers</div></div>
-        </div>
-      </div>
-
-      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;">
-        <div class="star-row" style="display:flex;gap:4px;margin-bottom:14px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-        <p style="font-size:0.92rem;line-height:1.6;color:var(--text);margin-bottom:16px;">"The reel script writer is insane. I give it a topic and I literally have a full script in 20 seconds. My posting frequency doubled."</p>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:36px;height:36px;background:linear-gradient(135deg,#ff5a5f,#cc3030);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:white;">A</div>
-          <div><div style="font-weight:600;font-size:0.88rem;">Arjun M.</div><div style="font-size:0.78rem;color:var(--muted);">Finance content · 28k YouTube</div></div>
-        </div>
-      </div>
-
-      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;">
-        <div class="star-row" style="display:flex;gap:4px;margin-bottom:14px;"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-        <p style="font-size:0.92rem;line-height:1.6;color:var(--text);margin-bottom:16px;">"Paid $5 expecting like one useful tool. Got 19 tools that I use literally every day. Honestly underselling themselves."</p>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:36px;height:36px;background:linear-gradient(135deg,#7c6fff,#4a3fbf);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;color:white;">R</div>
-          <div><div style="font-weight:600;font-size:0.88rem;">Riya K.</div><div style="font-size:0.78rem;color:var(--muted);">Lifestyle creator · 67k Instagram</div></div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Rating badge like the image -->
-    <div style="display:flex;justify-content:center;margin-top:36px;">
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:10px 22px;display:inline-flex;align-items:center;gap:16px;font-size:0.88rem;">
-        <span style="display:flex;align-items:center;gap:6px;font-weight:600;"><span style="color:#f5a623;">★</span> 4.9</span>
-        <span style="width:1px;height:18px;background:var(--border);"></span>
-        <span style="color:var(--muted);">Trusted by <strong style="color:var(--text);">11,200+</strong> content creators</span>
+    <div style="display:flex;justify-content:center;">
+      <div class="review-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;max-width:480px;">
+        <div style="font-size:2rem;margin-bottom:12px;">🌱</div>
+        <p style="font-size:0.95rem;line-height:1.6;color:var(--text);margin-bottom:20px;">CreatorKit just launched — there are no reviews yet, and we'd rather tell you that than fake some. Try a tool, and if you like it, be the first to leave one.</p>
+        <a href="#write-review" class="btn-primary" style="display:inline-block;padding:12px 24px;text-decoration:none;">Leave the first review</a>
       </div>
     </div>
   </div>
@@ -3430,7 +3432,7 @@
 </section>
 
 <!-- REVIEW SECTION -->
-<section style="padding:70px 0;background:var(--bg);border-top:1px solid var(--border);">
+<section id="write-review" style="padding:70px 0;background:var(--bg);border-top:1px solid var(--border);">
   <div class="wrap" style="max-width:640px;">
     <div id="reviewFormWrap" style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;">
       <div style="text-align:center;margin-bottom:28px;">
@@ -5113,88 +5115,17 @@
     renderSaved();
   }
 
-  // Ticker content
+  // Ticker content — honest, no fabricated numbers
   const tickerItems = [
-    '<b>4,200+</b> posts generated today',
     '<b>19 AI tools</b> · one price · forever',
-    '"Finally, something built for creators" 🔥',
-    'avg. time saved per post: <b>47 minutes</b>',
-    '<b>11,200+</b> creators using CreatorKit',
+    '🚀 just launched — try it free, no signup',
     'one payment · zero subscriptions · ever',
     'hook · script · caption · hashtag · thumbnail · bio',
-    '<b>4.9/5</b> average rating from early users'
+    '<b>$5</b> once. Not $15/month forever.'
   ];
   const tickerEl = document.getElementById('tickerEl');
   const tickerHTML = tickerItems.map(t => `<span>${t}</span>`).join('');
   tickerEl.innerHTML = tickerHTML + tickerHTML;
-
-  // ===== LIFETIME TOOLS COUNTER (count-up on scroll into view) =====
-  (function() {
-    const el = document.getElementById('lifetimeToolsNum');
-    if (!el) return;
-
-    // Deterministic growing base tied to today's date, so it's consistent on refresh
-    // but keeps climbing day over day (same style as the "today" live counter above).
-    const epoch = new Date('2026-01-01').getTime();
-    const daysSinceLaunch = Math.max(1, Math.floor((Date.now() - epoch) / 86400000));
-    const target = 41200 + daysSinceLaunch * 63; // steady daily growth
-
-    let animated = false;
-    const counterObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !animated) {
-          animated = true;
-          const duration = 1400;
-          const start = performance.now();
-          function tick(now) {
-            const progress = Math.min(1, (now - start) / duration);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            el.textContent = Math.floor(eased * target).toLocaleString();
-            if (progress < 1) requestAnimationFrame(tick);
-            else el.textContent = target.toLocaleString();
-          }
-          requestAnimationFrame(tick);
-          counterObserver.unobserve(el);
-        }
-      });
-    }, { threshold: 0.4 });
-    counterObserver.observe(el);
-  })();
-
-  // ===== LIVE COUNTER =====
-  (function() {
-    const numEl = document.getElementById('liveCounterNum');
-    if (!numEl) return;
-
-    // Base count derived from today's date so it resets daily but feels consistent on refresh
-    const today = new Date();
-    const dayNum = today.getFullYear() * 400 + today.getMonth() * 31 + today.getDate();
-    const seedBase = 1800 + (dayNum % 900); // rough base for "so far today"
-
-    // Grow the base a bit depending on time of day (more activity = later in day)
-    const hour = today.getHours();
-    let count = seedBase + Math.floor(hour * 22 + Math.random() * 40);
-
-    numEl.textContent = count.toLocaleString();
-
-    function bump() {
-      const inc = Math.floor(Math.random() * 3) + 1; // +1 to +3
-      count += inc;
-      numEl.textContent = count.toLocaleString();
-      numEl.classList.remove('bump');
-      void numEl.offsetWidth; // restart animation
-      numEl.classList.add('bump');
-    }
-
-    function scheduleNext() {
-      const delay = 3000 + Math.random() * 5000; // every 3-8s
-      setTimeout(() => {
-        bump();
-        scheduleNext();
-      }, delay);
-    }
-    scheduleNext();
-  })();
 
 
   // Hero phone demo - cycling caption examples (pre-written, no API)
@@ -7996,36 +7927,12 @@ document.querySelectorAll('.btn-primary, .nav-cta').forEach(btn => {
   });
 });
 
-// 9. SECTION REVEALS — add reveal class dynamically to sections
-document.querySelectorAll('section').forEach((sec, i) => {
-  if (!sec.classList.contains('hero')) {
-    sec.style.opacity = '0';
-    sec.style.transform = 'translateY(30px)';
-    sec.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
-    revealObserver.observe(sec);
-    sec.addEventListener('intersect', () => {
-      sec.style.opacity = '1';
-      sec.style.transform = 'translateY(0)';
-    });
-  }
-});
+// 9. SECTION REVEALS — disabled: this used to hide every section (Tools,
+// Pricing, Reviews, etc.) with opacity:0 until a scroll-triggered
+// IntersectionObserver fired. In some mobile/preview environments that
+// trigger never fired reliably, leaving whole sections permanently
+// invisible. Sections are now always visible immediately; no hide/reveal.
 
-const sectionReveal = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.style.opacity = '1';
-      e.target.style.transform = 'translateY(0)';
-      sectionReveal.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
-
-document.querySelectorAll('section:not(.hero)').forEach(sec => {
-  sec.style.opacity = '0';
-  sec.style.transform = 'translateY(30px)';
-  sec.style.transition = 'opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1)';
-  sectionReveal.observe(sec);
-});
 
 // ===== AI SUPPORT CHAT WIDGET =====
 (function () {
@@ -8354,8 +8261,7 @@ document.querySelectorAll('section:not(.hero)').forEach(sec => {
   if (!toast || !textEl) return;
 
   const MESSAGES = [
-    { icon: '🎉', text: '11,200+ creators are already using CreatorKit' },
-    { icon: '⭐', text: 'Rated 4.9/5 by early users' },
+    { icon: '🚀', text: 'Just launched — try the caption generator free' },
     { icon: '🎁', text: 'Invite a friend — save up to 50% on your unlock' },
     { icon: '🔒', text: '48-hour money-back guarantee, no questions asked' },
     { icon: '⚡', text: '19 tools, unlimited generations, one $5 payment' },
