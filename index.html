@@ -7,6 +7,92 @@
 
 <!-- SEO -->
 <meta name="description" content="19 AI tools for content creators — hooks, scripts, captions, hashtags, and more, done in 30 seconds. Pay once, $5, use forever. No subscription.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://creatorkitapp.vercel.app/">
+<meta name="keywords" content="AI caption generator, content creator tools, Instagram hook generator, reel script writer, hashtag finder, bio optimizer, one-time payment AI tools">
+
+<!-- JSON-LD structured data (helps Google understand and rich-display this page) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "CreatorKit",
+  "url": "https://creatorkitapp.vercel.app/",
+  "description": "19 AI tools for content creators and freelancers — hooks, scripts, captions, hashtags, and more. One-time $5 payment, no subscription.",
+  "email": "support@creatorkit.app"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "CreatorKit",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any (Web-based)",
+  "offers": {
+    "@type": "Offer",
+    "price": "5",
+    "priceCurrency": "USD"
+  },
+  "description": "19 AI tools for content creators and freelancers — hooks, scripts, captions, hashtags, and more, generated in 30 seconds."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What tools are included in the $5 plan?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "All 19 tools — Hook Generator, Reel Script Writer, Caption Generator, Hashtag Finder, Comment Reply, Thumbnail Text, Content Calendar, YouTube Description + Tags, Collab Pitch DM, Bio Optimizer, Resume Bullet Writer, Tweet/X Post Generator, About Me Page Writer, Personal Brand Statement, Cold Email/DM for Gigs, Content Repurposing Tool, Poll/Question Post Ideas, Newsletter Intro Writer, and Apology/Crisis Response. New tools are added monthly at no extra cost."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it really a one-time payment? No subscription?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, 100%. Pay $5 once and you get lifetime access — no monthly charges, no renewals, no expiry."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use CreatorKit on my phone?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. CreatorKit works on any device — phone, tablet, laptop. No app to download, just open in your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is there a free trial?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — the Caption Generator is free to try without any payment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many times can I generate content?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Unlimited. There are no daily limits, no credit system, no caps."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get a refund?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes — if you change your mind within 48 hours of paying and haven't generated any content with the unlocked tools, we'll refund you in full."
+      }
+    }
+  ]
+}
+</script>
 
 <!-- PWA (installable app) -->
 <link rel="manifest" href="/manifest.json">
@@ -2088,6 +2174,98 @@
     to { opacity: 1; transform: none; }
   }
 
+  /* ===== COMPARISON TABLE ===== */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    align-items: stretch;
+  }
+  @media (max-width: 820px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+  .compare-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px 22px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s ease;
+  }
+  .compare-col.visible { opacity: 1; transform: translateY(0); }
+  .compare-col:hover { transform: translateY(-4px); }
+  .compare-col.best {
+    border: 2px solid var(--lime);
+    box-shadow: 0 0 0 5px rgba(var(--lime-rgb),0.08), 0 24px 48px -18px rgba(var(--lime-rgb),0.4);
+    z-index: 2;
+  }
+  @media (min-width: 821px) {
+    .compare-col.best { transform: translateY(24px) scale(1.05); }
+    .compare-col.best.visible { transform: translateY(0) scale(1.05); }
+    .compare-col.best:hover { transform: translateY(-4px) scale(1.05); }
+  }
+  .compare-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--lime);
+    color: var(--lime-text);
+    font-weight: 800;
+    font-size: 0.68rem;
+    padding: 6px 16px;
+    border-radius: 100px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    box-shadow: 0 8px 18px -4px rgba(var(--lime-rgb),0.55);
+    animation: compareBadgeFloat 2.4s ease-in-out infinite;
+    white-space: nowrap;
+  }
+  @keyframes compareBadgeFloat {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-3px); }
+  }
+  .compare-col h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .compare-col.best h4 { color: var(--lime); font-size: 1.15rem; }
+  .compare-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 10px 0 18px;
+  }
+  .compare-col.best .compare-price { color: var(--lime); }
+  .compare-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .compare-col.visible .compare-row { opacity: 1; transform: translateX(0); }
+  .compare-row:nth-child(2) { transition-delay: 0.05s; }
+  .compare-row:nth-child(3) { transition-delay: 0.1s; }
+  .compare-row:nth-child(4) { transition-delay: 0.15s; }
+  .compare-row:nth-child(5) { transition-delay: 0.2s; }
+  .compare-row:nth-child(6) { transition-delay: 0.25s; }
+  .compare-row:first-of-type { border-top: none; }
+  .compare-row .ck-icon { flex-shrink: 0; font-size: 0.95rem; margin-top: 1px; }
+  .compare-row.yes .ck-icon { color: var(--lime); }
+  .compare-row.no .ck-icon { color: var(--muted-2); }
+  .compare-col.best .compare-row { color: var(--text); font-weight: 500; }
+  .compare-col:not(.best) .compare-row { color: var(--muted); }
+
   /* ===== FOOTER ===== */
   .footer-grid {
     display: grid;
@@ -3252,6 +3430,14 @@
 
 <section class="price-section" id="pricing">
   <div class="section" style="padding-top:90px;padding-bottom:90px;">
+
+    <div class="reveal" style="display:flex;justify-content:center;margin-bottom:32px;">
+      <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(var(--lime-rgb),0.08);border:1px solid rgba(var(--lime-rgb),0.3);border-radius:100px;padding:9px 18px;">
+        <span style="font-size:1rem;">🌱</span>
+        <span style="font-size:0.82rem;color:var(--text);font-weight:600;">Founding price — $5 while we're just getting started</span>
+      </div>
+    </div>
+
     <div class="wrap price-grid">
       <div class="price-card" style="display:flex;flex-direction:column;">
         <div class="price-badge" style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--surface-2);color:var(--muted);border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;padding:5px 16px;border-radius:100px;text-transform:uppercase;white-space:nowrap;">No card needed</div>
@@ -3307,6 +3493,48 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON SECTION -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">// why creatorkit</div>
+      <h2>How it stacks up.</h2>
+    </div>
+
+    <div class="compare-grid">
+
+      <div class="compare-col" style="transition-delay:0s;">
+        <h4>Hiring a Freelancer</h4>
+        <div class="compare-price">$50–200<span style="font-size:0.85rem;font-weight:500;color:var(--muted);">/project</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Wait 1–3 days per delivery</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Pay again for every new project</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Revisions cost extra time or money</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Only 1 skill per person hired</span></div>
+      </div>
+
+      <div class="compare-col best" style="transition-delay:0.12s;">
+        <span class="compare-badge">Best Value</span>
+        <h4>CreatorKit</h4>
+        <div class="compare-price">$5<span style="font-size:0.85rem;font-weight:500;color:var(--muted);">/once, forever</span></div>
+        <div class="compare-row yes"><span class="ck-icon">✓</span><span>Results in under 30 seconds</span></div>
+        <div class="compare-row yes"><span class="ck-icon">✓</span><span>One payment, unlimited use, always</span></div>
+        <div class="compare-row yes"><span class="ck-icon">✓</span><span>Regenerate instantly, free, any time</span></div>
+        <div class="compare-row yes"><span class="ck-icon">✓</span><span>19 tools covering every content need</span></div>
+      </div>
+
+      <div class="compare-col" style="transition-delay:0.24s;">
+        <h4>Subscription AI Tools</h4>
+        <div class="compare-price">$10–30<span style="font-size:0.85rem;font-weight:500;color:var(--muted);">/month</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Keeps billing until you cancel</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Usually 1 tool, not a full toolkit</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Costs add up fast over a year</span></div>
+        <div class="compare-row no"><span class="ck-icon">✕</span><span>Easy to forget and keep paying for</span></div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -6476,6 +6704,16 @@
     </div>`;
   }
 
+  function freeToolUnlockCTA() {
+    return `<div style="margin-top:14px;padding:16px 18px;background:linear-gradient(135deg, rgba(var(--lime-rgb),0.1), rgba(124,111,255,0.06));border:1px solid rgba(var(--lime-rgb),0.3);border-radius:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between;">
+      <div>
+        <div style="font-weight:700;font-size:0.9rem;color:var(--text);margin-bottom:2px;">Liked these? There's 18 more tools.</div>
+        <div style="font-size:0.78rem;color:var(--muted);">Hooks, scripts, hashtags, bios, and more — one $5 payment, forever.</div>
+      </div>
+      <button class="btn-primary" style="padding:10px 20px;font-size:0.85rem;white-space:nowrap;" onclick="paywallNotice()">Unlock all 19 — $5</button>
+    </div>`;
+  }
+
   async function generateCaptions() {
     const topic = document.getElementById('captionTopic').value.trim();
     if (!topic) {
@@ -6527,6 +6765,7 @@
         });
         saveToHistory('Caption generator', topic, captions.join('\n'));
         results.insertAdjacentHTML('beforeend', comboSuggestionHTML('Caption generator', 'modalResults', 'captionModal'));
+        results.insertAdjacentHTML('beforeend', freeToolUnlockCTA());
       }
       results.classList.add('active');
     } catch (e) {
@@ -8190,6 +8429,21 @@ document.querySelectorAll('.btn-primary, .nav-cta').forEach(btn => {
         addMsg(findAnswer(text), 'bot');
       });
   };
+})();
+
+// ===== COMPARISON TABLE ENTRANCE ON SCROLL =====
+(function () {
+  const cols = document.querySelectorAll('.compare-col');
+  if (!cols.length) return;
+  const compareObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        compareObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  cols.forEach(el => compareObserver.observe(el));
 })();
 
 // ===== STAR RATING POP-IN ON SCROLL =====
