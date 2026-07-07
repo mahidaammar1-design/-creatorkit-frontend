@@ -1323,6 +1323,19 @@
   }
   .invoice-row-del:hover { color: var(--coral); }
 
+  .inv-pdf-overlay {
+    position: fixed; inset: 0; z-index: 99999;
+    background: var(--bg); color: var(--text);
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    font-family: 'Inter', sans-serif; font-size: 0.95rem;
+  }
+  .inv-pdf-spinner {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2.5px solid var(--border); border-top-color: var(--lime);
+    animation: invPdfSpin 0.7s linear infinite;
+  }
+  @keyframes invPdfSpin { to { transform: rotate(360deg); } }
+
   .inv-summary { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 10px; }
   .inv-summary-row {
     display: flex; justify-content: space-between; padding: 5px 0;
@@ -7870,7 +7883,10 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     const logo = window._ckInvoiceLogo;
 
     const template = document.createElement('div');
-    template.style.cssText = 'position:fixed;left:-9999px;top:0;width:760px;background:#ffffff;color:#111;font-family:Arial,Helvetica,sans-serif;padding:52px;';
+    // NOTE: html2canvas cannot reliably capture elements positioned at negative
+    // coordinates (it crops a blank region) — so we render this on-screen at (0,0)
+    // and cover it with a loading overlay instead of pushing it off-screen.
+    template.style.cssText = 'position:absolute;top:0;left:0;width:760px;background:#ffffff;color:#111;font-family:Arial,Helvetica,sans-serif;padding:52px;z-index:9998;';
     template.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:20px;">
         <div>
@@ -7923,12 +7939,18 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     `;
     document.body.appendChild(template);
 
+    const overlay = document.createElement('div');
+    overlay.className = 'inv-pdf-overlay';
+    overlay.innerHTML = `<div class="inv-pdf-spinner"></div><span>Preparing your invoice…</span>`;
+    document.body.appendChild(overlay);
+
     const originalLabel = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Preparing PDF…';
 
     const finish = () => {
       template.remove();
+      overlay.remove();
       btn.disabled = false;
       btn.textContent = originalLabel;
     };
@@ -7946,7 +7968,7 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       margin: 0,
       filename: `${number}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0, x: 0, y: 0 },
       jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
     }).from(template).save().then(() => {
       finish();
