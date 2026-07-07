@@ -8011,7 +8011,9 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       summaryLine('Subtotal', `${sym}${subtotal.toFixed(2)}`, false);
       if (discountPct > 0) summaryLine(`Discount (${discountPct}%)`, `-${sym}${discountAmt.toFixed(2)}`, false);
       if (taxPct > 0) summaryLine(`Tax (${taxPct}%)`, `${sym}${taxAmt.toFixed(2)}`, false);
-      page.drawLine({ start: { x: sumX1, y: fromTop(sy - 6) }, end: { x: sumX2, y: fromTop(sy - 6) }, thickness: 1, color: black });
+      sy += 4;
+      page.drawLine({ start: { x: sumX1, y: fromTop(sy) }, end: { x: sumX2, y: fromTop(sy) }, thickness: 1, color: black });
+      sy += 16;
       summaryLine('Total', `${sym}${total.toFixed(2)}`, true);
 
       if (notes) {
