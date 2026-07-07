@@ -1273,34 +1273,70 @@
 
   .util-swatch.selected { border-color: var(--lime); box-shadow: 0 0 0 2px rgba(var(--lime-rgb),0.25); }
 
-  .invoice-row-grid {
-    display: grid;
-    grid-template-columns: 1fr 60px 90px 90px 30px;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-
-  @media (max-width: 480px) {
-    .invoice-row-grid { grid-template-columns: 1fr 1fr; grid-template-areas: "desc desc" "qty rate" "total del"; }
-  }
-
-  .invoice-row-grid input {
+  .inv-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px 14px;
+    margin-bottom: 10px;
     background: var(--bg);
+  }
+
+  .inv-item-desc {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    padding: 4px 2px 10px;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 10px;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .inv-item-desc:focus { border-color: var(--lime); }
+  .inv-item-desc::placeholder { color: var(--muted-2); }
+
+  .inv-item-nums { display: flex; gap: 8px; align-items: flex-end; }
+
+  .inv-num-field { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .inv-num-field label {
+    font-size: 0.64rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .inv-num-field input {
+    width: 100%;
+    background: var(--surface-2);
     border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.82rem;
-    padding: 8px 9px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    padding: 9px 9px;
     outline: none;
-    width: 100%;
   }
+  .inv-num-field input:focus { border-color: var(--lime); }
+  .inv-amount-field input { opacity: 0.85; font-weight: 600; }
 
   .invoice-row-del {
-    background: none; border: none; color: var(--muted-2); cursor: pointer; font-size: 1.05rem;
+    flex: 0 0 auto;
+    background: none; border: none; color: var(--muted-2); cursor: pointer; font-size: 1.2rem;
+    padding-bottom: 9px; line-height: 1;
   }
   .invoice-row-del:hover { color: var(--coral); }
+
+  .inv-summary { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 10px; }
+  .inv-summary-row {
+    display: flex; justify-content: space-between; padding: 5px 0;
+    color: var(--muted); font-size: 0.85rem;
+  }
+  .inv-summary-row span:last-child { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+  .inv-summary-total {
+    border-top: 1px solid var(--border); margin-top: 6px; padding-top: 10px; font-size: 1.05rem;
+  }
+  .inv-summary-total span { color: var(--text) !important; font-weight: 700; font-family: 'Space Grotesk', sans-serif !important; }
+
+  @media (max-width: 480px) {
+    .inv-num-field label { font-size: 0.6rem; }
+  }
 
   .util-download-btn {
     width: 100%;
@@ -2945,6 +2981,7 @@
 </style>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://Accounts.google.com/gsi/client" async defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -4302,6 +4339,17 @@
       <h3>Build your invoice</h3>
     </div>
 
+    <div class="field-group">
+      <label class="field-label">Logo (optional)</label>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <label class="util-file-drop" style="flex:1;padding:12px;cursor:pointer;">
+          <span id="invLogoLabel">Click to upload logo</span>
+          <input type="file" accept="image/*" onchange="invLogoUpload(this)" style="display:none;" />
+        </label>
+        <div id="invLogoPreview"></div>
+      </div>
+    </div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div class="field-group">
         <label class="field-label">From (your name / business)</label>
@@ -4312,12 +4360,33 @@
         <input type="text" class="topic-input" id="invTo" placeholder="Client Name" />
       </div>
       <div class="field-group">
+        <label class="field-label">Your details (optional)</label>
+        <textarea class="topic-input" id="invFromDetails" rows="2" placeholder="Address, email, phone" style="resize:none;font-family:'Inter',sans-serif;"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Client details (optional)</label>
+        <textarea class="topic-input" id="invToDetails" rows="2" placeholder="Address, email" style="resize:none;font-family:'Inter',sans-serif;"></textarea>
+      </div>
+      <div class="field-group">
         <label class="field-label">Invoice #</label>
         <input type="text" class="topic-input" id="invNumber" placeholder="INV-001" />
       </div>
       <div class="field-group">
-        <label class="field-label">Date</label>
+        <label class="field-label">Currency</label>
+        <select class="util-select" id="invCurrency" onchange="updateInvoiceTotal()">
+          <option value="USD">$ USD</option>
+          <option value="INR">₹ INR</option>
+          <option value="EUR">€ EUR</option>
+          <option value="GBP">£ GBP</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Issue date</label>
         <input type="date" class="topic-input" id="invDate" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Due date</label>
+        <input type="date" class="topic-input" id="invDueDate" />
       </div>
     </div>
 
@@ -4327,14 +4396,27 @@
       <button class="util-download-btn" style="margin-top:0;" onclick="addInvoiceRow()">+ Add item</button>
     </div>
 
-    <div class="field-group">
-      <label class="field-label">Notes (optional)</label>
-      <input type="text" class="topic-input" id="invNotes" placeholder="e.g. Payment due within 7 days · UPI: yourname@bank" />
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="field-group">
+        <label class="field-label">Discount (%)</label>
+        <input type="number" class="topic-input" id="invDiscount" min="0" max="100" step="0.1" placeholder="0" oninput="updateInvoiceTotal()" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Tax (%)</label>
+        <input type="number" class="topic-input" id="invTax" min="0" max="100" step="0.1" placeholder="0" oninput="updateInvoiceTotal()" />
+      </div>
     </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--border);margin-top:6px;">
-      <span style="color:var(--muted);font-size:0.88rem;">Total</span>
-      <span id="invTotal" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.3rem;">$0.00</span>
+    <div class="field-group">
+      <label class="field-label">Notes / payment details (optional)</label>
+      <textarea class="topic-input" id="invNotes" rows="2" placeholder="e.g. Payment due within 7 days · UPI: yourname@bank" style="resize:none;font-family:'Inter',sans-serif;"></textarea>
+    </div>
+
+    <div class="inv-summary">
+      <div class="inv-summary-row"><span>Subtotal</span><span id="invSubtotal">$0.00</span></div>
+      <div class="inv-summary-row"><span>Discount</span><span id="invDiscountAmt">-$0.00</span></div>
+      <div class="inv-summary-row"><span>Tax</span><span id="invTaxAmt">$0.00</span></div>
+      <div class="inv-summary-row inv-summary-total"><span>Total</span><span id="invTotal">$0.00</span></div>
     </div>
 
     <button class="generate-btn" id="invoiceBtn" onclick="downloadInvoice()">Download invoice (PDF)</button>
@@ -7638,28 +7720,82 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
 
   // ===== INVOICE GENERATOR (free, client-side) =====
   let invoiceRowCount = 0;
+  const invCurrencySymbols = { USD: '$', INR: '₹', EUR: '€', GBP: '£' };
+
+  function invSymbol() {
+    const el = document.getElementById('invCurrency');
+    return invCurrencySymbols[el ? el.value : 'USD'] || '$';
+  }
+
   function openInvoiceModal() {
     document.getElementById('invoiceModal').classList.add('active');
+
     if (!document.getElementById('invDate').value) {
       document.getElementById('invDate').value = new Date().toISOString().slice(0, 10);
     }
-    if (invoiceRowCount === 0) {
-      addInvoiceRow(); addInvoiceRow();
+    if (!document.getElementById('invDueDate').value) {
+      const d = new Date();
+      d.setDate(d.getDate() + 7);
+      document.getElementById('invDueDate').value = d.toISOString().slice(0, 10);
     }
+
+    // restore saved business profile so returning users don't retype everything
+    try {
+      const saved = JSON.parse(localStorage.getItem('ck_invoice_profile') || '{}');
+      if (saved.from && !document.getElementById('invFrom').value) document.getElementById('invFrom').value = saved.from;
+      if (saved.fromDetails && !document.getElementById('invFromDetails').value) document.getElementById('invFromDetails').value = saved.fromDetails;
+      if (saved.currency) document.getElementById('invCurrency').value = saved.currency;
+      if (saved.logo) {
+        window._ckInvoiceLogo = saved.logo;
+        document.getElementById('invLogoPreview').innerHTML = `<img src="${saved.logo}" style="max-height:44px;max-width:120px;border-radius:6px;" />`;
+        document.getElementById('invLogoLabel').textContent = 'Logo saved — click to change';
+      }
+    } catch (e) {}
+
+    if (!document.getElementById('invNumber').value) {
+      const n = parseInt(localStorage.getItem('ck_invoice_seq') || '0', 10) + 1;
+      document.getElementById('invNumber').value = 'INV-' + String(n).padStart(3, '0');
+    }
+
+    if (invoiceRowCount === 0) { addInvoiceRow(); addInvoiceRow(); }
+    updateInvoiceTotal();
+  }
+
+  function invLogoUpload(input) {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      window._ckInvoiceLogo = e.target.result;
+      document.getElementById('invLogoPreview').innerHTML = `<img src="${e.target.result}" style="max-height:44px;max-width:120px;border-radius:6px;" />`;
+      document.getElementById('invLogoLabel').textContent = 'Logo added — click to change';
+    };
+    reader.readAsDataURL(file);
   }
 
   function addInvoiceRow() {
     invoiceRowCount++;
     const id = invoiceRowCount;
     const row = document.createElement('div');
-    row.className = 'invoice-row-grid';
+    row.className = 'inv-item';
     row.id = `invRow${id}`;
     row.innerHTML = `
-      <input type="text" placeholder="Description" oninput="updateInvoiceTotal()" style="grid-area:desc;" />
-      <input type="number" placeholder="Qty" value="1" min="0" step="1" oninput="updateInvoiceTotal()" onchange="updateInvoiceTotal()" onkeyup="updateInvoiceTotal()" style="grid-area:qty;" />
-      <input type="number" placeholder="Rate" min="0" step="0.01" oninput="updateInvoiceTotal()" onchange="updateInvoiceTotal()" onkeyup="updateInvoiceTotal()" style="grid-area:rate;" />
-      <input type="text" disabled placeholder="$0.00" class="invRowTotal" style="grid-area:total;opacity:0.7;" />
-      <button class="invoice-row-del" onclick="removeInvoiceRow(${id})" style="grid-area:del;">✕</button>
+      <input type="text" class="inv-item-desc" placeholder="Item / service description" oninput="updateInvoiceTotal()" />
+      <div class="inv-item-nums">
+        <div class="inv-num-field">
+          <label>Qty</label>
+          <input type="number" class="inv-item-qty" value="1" min="0" step="1" inputmode="decimal" oninput="updateInvoiceTotal()" />
+        </div>
+        <div class="inv-num-field">
+          <label>Rate</label>
+          <input type="number" class="inv-item-rate" placeholder="0.00" min="0" step="0.01" inputmode="decimal" oninput="updateInvoiceTotal()" />
+        </div>
+        <div class="inv-num-field inv-amount-field">
+          <label>Amount</label>
+          <input type="text" class="inv-item-amount" disabled value="0.00" />
+        </div>
+        <button type="button" class="invoice-row-del" onclick="removeInvoiceRow(${id})" title="Remove item">✕</button>
+      </div>
     `;
     document.getElementById('invoiceRows').appendChild(row);
     updateInvoiceTotal();
@@ -7672,80 +7808,159 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
   }
 
   function updateInvoiceTotal() {
-    let total = 0;
-    document.querySelectorAll('#invoiceRows .invoice-row-grid').forEach(row => {
-      const inputs = row.querySelectorAll('input');
-      const qty = parseFloat(String(inputs[1].value).replace(/,/g, '')) || 0;
-      const rate = parseFloat(String(inputs[2].value).replace(/,/g, '')) || 0;
-      const rowTotal = qty * rate;
-      inputs[3].value = `$${rowTotal.toFixed(2)}`;
-      total += rowTotal;
+    const sym = invSymbol();
+    let subtotal = 0;
+
+    document.querySelectorAll('#invoiceRows .inv-item').forEach(row => {
+      const qty = parseFloat(row.querySelector('.inv-item-qty').value) || 0;
+      const rate = parseFloat(row.querySelector('.inv-item-rate').value) || 0;
+      const amt = qty * rate;
+      row.querySelector('.inv-item-amount').value = amt.toFixed(2);
+      subtotal += amt;
     });
-    document.getElementById('invTotal').textContent = `$${total.toFixed(2)}`;
-    return total;
+
+    const discountPct = parseFloat(document.getElementById('invDiscount').value) || 0;
+    const taxPct = parseFloat(document.getElementById('invTax').value) || 0;
+    const discountAmt = subtotal * (discountPct / 100);
+    const taxable = subtotal - discountAmt;
+    const taxAmt = taxable * (taxPct / 100);
+    const total = taxable + taxAmt;
+
+    document.getElementById('invSubtotal').textContent = `${sym}${subtotal.toFixed(2)}`;
+    document.getElementById('invDiscountAmt').textContent = `-${sym}${discountAmt.toFixed(2)}`;
+    document.getElementById('invTaxAmt').textContent = `${sym}${taxAmt.toFixed(2)}`;
+    document.getElementById('invTotal').textContent = `${sym}${total.toFixed(2)}`;
+
+    return { subtotal, discountAmt, taxAmt, total, sym };
   }
 
-  // Safety net: event delegation in case any row's inline handlers ever fail to fire
-  // (e.g. some mobile keyboards don't reliably trigger 'input' on number fields)
-  document.addEventListener('DOMContentLoaded', function () {
-    const invoiceRowsWrap = document.getElementById('invoiceRows');
-    if (invoiceRowsWrap) {
-      ['input', 'change', 'keyup'].forEach(evt => {
-        invoiceRowsWrap.addEventListener(evt, function (e) {
-          if (e.target && e.target.tagName === 'INPUT' && !e.target.disabled) {
-            updateInvoiceTotal();
-          }
-        });
-      });
-    }
-  });
-
   function downloadInvoice() {
-    const from = document.getElementById('invFrom').value.trim() || 'Your Name';
+    const btn = document.getElementById('invoiceBtn');
+    const from = document.getElementById('invFrom').value.trim() || 'Your Name / Studio';
+    const fromDetails = document.getElementById('invFromDetails').value.trim();
     const to = document.getElementById('invTo').value.trim() || 'Client Name';
+    const toDetails = document.getElementById('invToDetails').value.trim();
     const number = document.getElementById('invNumber').value.trim() || 'INV-001';
     const date = document.getElementById('invDate').value || new Date().toISOString().slice(0, 10);
+    const dueDate = document.getElementById('invDueDate').value;
     const notes = document.getElementById('invNotes').value.trim();
-    const total = updateInvoiceTotal();
+    const discountPct = parseFloat(document.getElementById('invDiscount').value) || 0;
+    const taxPct = parseFloat(document.getElementById('invTax').value) || 0;
+    const { subtotal, discountAmt, taxAmt, total, sym } = updateInvoiceTotal();
 
     let rowsHtml = '';
-    document.querySelectorAll('#invoiceRows .invoice-row-grid').forEach(row => {
-      const inputs = row.querySelectorAll('input');
-      const desc = inputs[0].value.trim();
-      const qty = parseFloat(inputs[1].value) || 0;
-      const rate = parseFloat(inputs[2].value) || 0;
+    document.querySelectorAll('#invoiceRows .inv-item').forEach(row => {
+      const desc = row.querySelector('.inv-item-desc').value.trim();
+      const qty = parseFloat(row.querySelector('.inv-item-qty').value) || 0;
+      const rate = parseFloat(row.querySelector('.inv-item-rate').value) || 0;
       if (!desc && qty === 0 && rate === 0) return;
-      rowsHtml += `<tr><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;">${desc || '—'}</td><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;text-align:center;">${qty}</td><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;text-align:right;">$${rate.toFixed(2)}</td><td style="padding:10px 8px;border-bottom:1px solid #e5e5e0;text-align:right;">$${(qty*rate).toFixed(2)}</td></tr>`;
+      rowsHtml += `<tr>
+        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;">${desc || '—'}</td>
+        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;text-align:center;">${qty}</td>
+        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;text-align:right;">${sym}${rate.toFixed(2)}</td>
+        <td style="padding:12px 10px;border-bottom:1px solid #e8e8e4;text-align:right;font-weight:600;">${sym}${(qty * rate).toFixed(2)}</td>
+      </tr>`;
     });
 
-    const win = window.open('', '_blank');
-    win.document.write(`
-      <html><head><title>Invoice ${number}</title>
-      <style>
-        body{font-family:Arial,Helvetica,sans-serif;color:#111;padding:48px;max-width:720px;margin:0 auto;}
-        h1{font-size:1.6rem;margin-bottom:4px;}
-        table{width:100%;border-collapse:collapse;margin-top:24px;}
-        th{text-align:left;padding:10px 8px;border-bottom:2px solid #111;font-size:0.85rem;}
-        .total-row{font-weight:700;font-size:1.1rem;}
-        .meta{color:#555;font-size:0.9rem;margin-top:6px;}
-      </style></head>
-      <body>
-        <h1>Invoice</h1>
-        <div class="meta">${number} · ${date}</div>
-        <div style="display:flex;justify-content:space-between;margin-top:28px;">
-          <div><strong>From</strong><br>${from}</div>
-          <div style="text-align:right;"><strong>Bill to</strong><br>${to}</div>
+    if (!rowsHtml) {
+      alert('Add at least one item with a description or amount before downloading.');
+      return;
+    }
+
+    const logo = window._ckInvoiceLogo;
+
+    const template = document.createElement('div');
+    template.style.cssText = 'position:fixed;left:-9999px;top:0;width:760px;background:#ffffff;color:#111;font-family:Arial,Helvetica,sans-serif;padding:52px;';
+    template.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:20px;">
+        <div>
+          ${logo ? `<img src="${logo}" style="max-height:52px;max-width:160px;margin-bottom:10px;display:block;" />` : ''}
+          <div style="font-size:1.4rem;font-weight:700;">${from}</div>
+          ${fromDetails ? `<div style="color:#555;font-size:0.85rem;margin-top:4px;white-space:pre-line;">${fromDetails}</div>` : ''}
         </div>
-        <table>
-          <tr><th>Description</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Rate</th><th style="text-align:right;">Amount</th></tr>
-          ${rowsHtml}
-        </table>
-        <div style="display:flex;justify-content:flex-end;margin-top:18px;" class="total-row">Total: $${total.toFixed(2)}</div>
-        ${notes ? `<div style="margin-top:32px;color:#555;font-size:0.88rem;">${notes}</div>` : ''}
-        <script>window.onload = () => setTimeout(() => window.print(), 250);<\/script>
-      </body></html>
-    `);
-    win.document.close();
+        <div style="text-align:right;">
+          <div style="font-size:1.8rem;font-weight:800;letter-spacing:0.05em;color:#111;">INVOICE</div>
+          <div style="color:#555;font-size:0.85rem;margin-top:6px;">${number}</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:28px;">
+        <div>
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;margin-bottom:4px;">Bill to</div>
+          <div style="font-weight:700;font-size:1.02rem;">${to}</div>
+          ${toDetails ? `<div style="color:#555;font-size:0.85rem;margin-top:2px;white-space:pre-line;">${toDetails}</div>` : ''}
+        </div>
+        <div style="text-align:right;">
+          <div style="margin-bottom:8px;"><span style="color:#999;font-size:0.8rem;">Issue date&nbsp;&nbsp;</span><strong>${date}</strong></div>
+          ${dueDate ? `<div><span style="color:#999;font-size:0.8rem;">Due date&nbsp;&nbsp;</span><strong>${dueDate}</strong></div>` : ''}
+        </div>
+      </div>
+
+      <table style="width:100%;border-collapse:collapse;margin-top:32px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Description</th>
+            <th style="text-align:center;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Qty</th>
+            <th style="text-align:right;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Rate</th>
+            <th style="text-align:right;padding:10px;border-bottom:2px solid #111;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:#333;">Amount</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+        <div style="width:260px;">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;color:#444;font-size:0.9rem;"><span>Subtotal</span><span>${sym}${subtotal.toFixed(2)}</span></div>
+          ${discountPct > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;color:#444;font-size:0.9rem;"><span>Discount (${discountPct}%)</span><span>-${sym}${discountAmt.toFixed(2)}</span></div>` : ''}
+          ${taxPct > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;color:#444;font-size:0.9rem;"><span>Tax (${taxPct}%)</span><span>${sym}${taxAmt.toFixed(2)}</span></div>` : ''}
+          <div style="display:flex;justify-content:space-between;padding:12px 0 0;margin-top:6px;border-top:2px solid #111;font-weight:800;font-size:1.15rem;"><span>Total</span><span>${sym}${total.toFixed(2)}</span></div>
+        </div>
+      </div>
+
+      ${notes ? `<div style="margin-top:40px;padding-top:16px;border-top:1px solid #e5e5e0;color:#555;font-size:0.85rem;white-space:pre-line;">${notes}</div>` : ''}
+
+      <div style="margin-top:48px;text-align:center;color:#bbb;font-size:0.7rem;">Generated with CreatorKit — creatorkitapp.vercel.app</div>
+    `;
+    document.body.appendChild(template);
+
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Preparing PDF…';
+
+    const finish = () => {
+      template.remove();
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    };
+
+    if (typeof html2pdf === 'undefined') {
+      // fallback if the PDF library failed to load (offline, blocked script, etc.)
+      finish();
+      const win = window.open('', '_blank');
+      win.document.write(`<html><head><title>Invoice ${number}</title></head><body>${template.innerHTML}<script>window.onload=()=>setTimeout(()=>window.print(),250);<\/script></body></html>`);
+      win.document.close();
+      return;
+    }
+
+    html2pdf().set({
+      margin: 0,
+      filename: `${number}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+    }).from(template).save().then(() => {
+      finish();
+      try {
+        localStorage.setItem('ck_invoice_profile', JSON.stringify({
+          from, fromDetails, currency: document.getElementById('invCurrency').value, logo: logo || null
+        }));
+        const seq = parseInt(localStorage.getItem('ck_invoice_seq') || '0', 10) + 1;
+        localStorage.setItem('ck_invoice_seq', String(seq));
+      } catch (e) {}
+    }).catch(() => {
+      finish();
+      alert('Something went wrong generating the PDF. Please try again.');
+    });
   }
 
   // ===== SCREENSHOT BEAUTIFIER (free, client-side canvas) =====
