@@ -8117,6 +8117,10 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     const currency = document.getElementById('invCurrency').value;
     const template = invoiceTemplate;
     const { subtotal, discountAmt, taxAmt, total, sym } = updateInvoiceTotal();
+    // pdf-lib's built-in fonts (Helvetica/Times) use WinAnsi encoding, which can't
+    // draw the ₹ glyph and throws "WinAnsi cannot encode ₹". Use a safe "Rs." label
+    // inside the PDF only \u2014 the on-screen UI still shows the real ₹ symbol.
+    const pdfSym = sym === '\u20B9' ? 'Rs. ' : sym;
 
     const rawItems = [];
     const items = [];
@@ -8131,8 +8135,8 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       items.push({
         desc: desc || '\u2014',
         qtyStr: String(qty),
-        rateStr: `${sym}${rate.toFixed(2)}`,
-        amtStr: `${sym}${(qty * rate).toFixed(2)}`,
+        rateStr: `${pdfSym}${rate.toFixed(2)}`,
+        amtStr: `${pdfSym}${(qty * rate).toFixed(2)}`,
         hsn
       });
     });
@@ -8316,9 +8320,9 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
         sy += bold ? 18 : 15;
       }
 
-      summaryLine('Subtotal', `${sym}${subtotal.toFixed(2)}`, false);
-      if (discountPct > 0) summaryLine(`Discount (${discountPct}%)`, `-${sym}${discountAmt.toFixed(2)}`, false);
-      if (taxPct > 0) summaryLine(`Tax (${taxPct}%)`, `${sym}${taxAmt.toFixed(2)}`, false);
+      summaryLine('Subtotal', `${pdfSym}${subtotal.toFixed(2)}`, false);
+      if (discountPct > 0) summaryLine(`Discount (${discountPct}%)`, `-${pdfSym}${discountAmt.toFixed(2)}`, false);
+      if (taxPct > 0) summaryLine(`Tax (${taxPct}%)`, `${pdfSym}${taxAmt.toFixed(2)}`, false);
       sy += 4;
       if (isBold) {
         page.drawRectangle({ x: sumX1 - 8, y: fromTop(sy + 20), width: (sumX2 - sumX1) + 8, height: 22, color: bandColor });
@@ -8326,14 +8330,14 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
         sy += 16;
         const f = fontBold, size = 11.5;
         page.drawText('Total', { x: sumX1, y: fromTop(sy), size, font: f, color: white });
-        const totalStr = `${sym}${total.toFixed(2)}`;
+        const totalStr = `${pdfSym}${total.toFixed(2)}`;
         const w = f.widthOfTextAtSize(totalStr, size);
         page.drawText(totalStr, { x: sumX2 - w, y: fromTop(sy), size, font: f, color: white });
         sy += 18;
       } else {
         page.drawLine({ start: { x: sumX1, y: fromTop(sy) }, end: { x: sumX2, y: fromTop(sy) }, thickness: 1, color: black });
         sy += 16;
-        summaryLine('Total', `${sym}${total.toFixed(2)}`, true);
+        summaryLine('Total', `${pdfSym}${total.toFixed(2)}`, true);
       }
 
       if (notes) {
