@@ -1338,6 +1338,72 @@
     .inv-num-field label { font-size: 0.6rem; }
   }
 
+  /* GST / HSN mini-field inside an item row */
+  .inv-item-hsn-row { margin-top: 8px; }
+  .inv-item-hsn-row input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    padding: 7px 9px;
+    outline: none;
+  }
+  .inv-item-hsn-row input:focus { border-color: var(--lime); }
+  .inv-item-hsn-row input::placeholder { color: var(--muted-2); }
+
+  /* Template picker */
+  .inv-template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .inv-template-card {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 8px;
+    cursor: pointer;
+    text-align: center;
+    background: var(--bg);
+  }
+  .inv-template-card.selected { border-color: var(--lime); box-shadow: 0 0 0 2px rgba(var(--lime-rgb),0.2); }
+  .inv-template-swatch {
+    height: 40px; border-radius: 6px; margin-bottom: 8px;
+    background: var(--surface-2); position: relative; overflow: hidden;
+  }
+  .inv-template-swatch::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 12px; }
+  .inv-template-swatch.tpl-minimal::before { background: var(--muted-2); }
+  .inv-template-swatch.tpl-bold::before { background: var(--lime); height: 18px; }
+  .inv-template-swatch.tpl-classic { border: 1.5px solid var(--muted-2); }
+  .inv-template-swatch.tpl-classic::before { background: transparent; }
+  .inv-template-card span { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
+  .inv-template-card.selected span { color: var(--text); }
+
+  /* Recent invoices */
+  .inv-history-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; padding: 10px 2px; font-size: 0.82rem; color: var(--muted);
+    font-weight: 600; user-select: none;
+  }
+  .inv-history-toggle .chev { transition: transform 0.2s ease; }
+  .inv-history-toggle.open .chev { transform: rotate(180deg); }
+  .inv-history-list { display: none; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .inv-history-list.open { display: flex; }
+  .inv-history-item {
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px;
+    background: var(--bg); gap: 10px;
+  }
+  .inv-history-item-main { min-width: 0; }
+  .inv-history-item-num { font-size: 0.85rem; font-weight: 600; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .inv-history-item-sub { font-size: 0.74rem; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .inv-history-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .inv-history-btn {
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    font-size: 0.72rem; font-weight: 600; padding: 6px 10px; border-radius: 7px; cursor: pointer;
+  }
+  .inv-history-btn:hover { border-color: var(--lime); }
+  .inv-history-empty { font-size: 0.8rem; color: var(--muted-2); padding: 6px 2px 12px; }
+  .inv-history-clear { font-size: 0.72rem; color: var(--muted-2); background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; }
+
   .util-download-btn {
     width: 100%;
     background: var(--surface-2);
@@ -4339,6 +4405,30 @@
       <h3>Build your invoice</h3>
     </div>
 
+    <div class="inv-history-toggle" id="invHistoryToggle" onclick="toggleInvoiceHistory()">
+      <span>🕓 Recent invoices <span id="invHistoryCount" style="color:var(--muted-2);"></span></span>
+      <span class="chev">▾</span>
+    </div>
+    <div class="inv-history-list" id="invHistoryList"></div>
+
+    <div class="field-group">
+      <label class="field-label">Template</label>
+      <div class="inv-template-grid" id="invTemplatePicker">
+        <div class="inv-template-card selected" data-template="minimal" onclick="selectInvoiceTemplate('minimal')">
+          <div class="inv-template-swatch tpl-minimal"></div>
+          <span>Minimal</span>
+        </div>
+        <div class="inv-template-card" data-template="bold" onclick="selectInvoiceTemplate('bold')">
+          <div class="inv-template-swatch tpl-bold"></div>
+          <span>Bold header</span>
+        </div>
+        <div class="inv-template-card" data-template="classic" onclick="selectInvoiceTemplate('classic')">
+          <div class="inv-template-swatch tpl-classic"></div>
+          <span>Classic border</span>
+        </div>
+      </div>
+    </div>
+
     <div class="field-group">
       <label class="field-label">Logo (optional)</label>
       <div style="display:flex;align-items:center;gap:12px;">
@@ -4366,6 +4456,14 @@
       <div class="field-group">
         <label class="field-label">Client details (optional)</label>
         <textarea class="topic-input" id="invToDetails" rows="2" placeholder="Address, email" style="resize:none;font-family:'Inter',sans-serif;"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Your GSTIN (optional)</label>
+        <input type="text" class="topic-input" id="invGstin" placeholder="22AAAAA0000A1Z5" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase;" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Client GSTIN (optional)</label>
+        <input type="text" class="topic-input" id="invToGstin" placeholder="27BBBBB1111B2Z6" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase;" />
       </div>
       <div class="field-group">
         <label class="field-label">Invoice #</label>
@@ -4408,9 +4506,21 @@
     </div>
 
     <div class="field-group">
-      <label class="field-label">Notes / payment details (optional)</label>
-      <textarea class="topic-input" id="invNotes" rows="2" placeholder="e.g. Payment due within 7 days · UPI: yourname@bank" style="resize:none;font-family:'Inter',sans-serif;"></textarea>
+      <label class="field-label">Notes (optional)</label>
+      <textarea class="topic-input" id="invNotes" rows="2" placeholder="e.g. Payment due within 7 days" style="resize:none;font-family:'Inter',sans-serif;"></textarea>
     </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="field-group">
+        <label class="field-label">UPI ID (optional)</label>
+        <input type="text" class="topic-input" id="invUpi" placeholder="yourname@okhdfcbank" style="font-family:'JetBrains Mono',monospace;" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Payment link (optional)</label>
+        <input type="text" class="topic-input" id="invPayLink" placeholder="https://rzp.io/l/yourlink or PayPal.me" />
+      </div>
+    </div>
+    <p style="font-size:0.74rem;color:var(--muted-2);margin:-6px 0 14px;line-height:1.5;">Add a UPI ID and/or your own Razorpay Payment Link (create one free in your Razorpay dashboard). A "Pay Now" link + QR code will be added to the PDF so your client can pay straight from it.</p>
 
     <div class="inv-summary">
       <div class="inv-summary-row"><span>Subtotal</span><span id="invSubtotal">$0.00</span></div>
@@ -7720,11 +7830,21 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
 
   // ===== INVOICE GENERATOR (free, client-side) =====
   let invoiceRowCount = 0;
+  let invoiceTemplate = 'minimal';
   const invCurrencySymbols = { USD: '$', INR: '₹', EUR: '€', GBP: '£' };
+  const INV_HISTORY_KEY = 'ck_invoice_history';
+  const INV_HISTORY_MAX = 10;
 
   function invSymbol() {
     const el = document.getElementById('invCurrency');
     return invCurrencySymbols[el ? el.value : 'USD'] || '$';
+  }
+
+  function selectInvoiceTemplate(name) {
+    invoiceTemplate = name;
+    document.querySelectorAll('#invTemplatePicker .inv-template-card').forEach(card => {
+      card.classList.toggle('selected', card.getAttribute('data-template') === name);
+    });
   }
 
   function openInvoiceModal() {
@@ -7744,7 +7864,11 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       const saved = JSON.parse(localStorage.getItem('ck_invoice_profile') || '{}');
       if (saved.from && !document.getElementById('invFrom').value) document.getElementById('invFrom').value = saved.from;
       if (saved.fromDetails && !document.getElementById('invFromDetails').value) document.getElementById('invFromDetails').value = saved.fromDetails;
+      if (saved.gstin && !document.getElementById('invGstin').value) document.getElementById('invGstin').value = saved.gstin;
+      if (saved.upi && !document.getElementById('invUpi').value) document.getElementById('invUpi').value = saved.upi;
+      if (saved.payLink && !document.getElementById('invPayLink').value) document.getElementById('invPayLink').value = saved.payLink;
       if (saved.currency) document.getElementById('invCurrency').value = saved.currency;
+      if (saved.template) selectInvoiceTemplate(saved.template);
       if (saved.logo) {
         window._ckInvoiceLogo = saved.logo;
         document.getElementById('invLogoPreview').innerHTML = `<img src="${saved.logo}" style="max-height:44px;max-width:120px;border-radius:6px;" />`;
@@ -7759,6 +7883,7 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
 
     if (invoiceRowCount === 0) { addInvoiceRow(); addInvoiceRow(); }
     updateInvoiceTotal();
+    renderInvoiceHistory();
   }
 
   function invLogoUpload(input) {
@@ -7773,7 +7898,7 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     reader.readAsDataURL(file);
   }
 
-  function addInvoiceRow() {
+  function addInvoiceRow(prefill) {
     invoiceRowCount++;
     const id = invoiceRowCount;
     const row = document.createElement('div');
@@ -7796,8 +7921,17 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
         </div>
         <button type="button" class="invoice-row-del" onclick="removeInvoiceRow(${id})" title="Remove item">✕</button>
       </div>
+      <div class="inv-item-hsn-row">
+        <input type="text" class="inv-item-hsn" placeholder="HSN/SAC code (optional)" style="text-transform:uppercase;" />
+      </div>
     `;
     document.getElementById('invoiceRows').appendChild(row);
+    if (prefill) {
+      row.querySelector('.inv-item-desc').value = prefill.desc || '';
+      row.querySelector('.inv-item-qty').value = prefill.qty != null ? prefill.qty : 1;
+      row.querySelector('.inv-item-rate').value = prefill.rate != null ? prefill.rate : '';
+      row.querySelector('.inv-item-hsn').value = prefill.hsn || '';
+    }
     updateInvoiceTotal();
   }
 
@@ -7805,6 +7939,90 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     const row = document.getElementById(`invRow${id}`);
     if (row) row.remove();
     updateInvoiceTotal();
+  }
+
+  // ---- Recent invoices (localStorage, last 10, no backend needed) ----
+  function getInvoiceHistory() {
+    try { return JSON.parse(localStorage.getItem(INV_HISTORY_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+
+  function saveInvoiceToHistory(record) {
+    let list = getInvoiceHistory();
+    list.unshift(record);
+    if (list.length > INV_HISTORY_MAX) list = list.slice(0, INV_HISTORY_MAX);
+    try { localStorage.setItem(INV_HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+
+  function toggleInvoiceHistory() {
+    const list = document.getElementById('invHistoryList');
+    const toggle = document.getElementById('invHistoryToggle');
+    const open = !list.classList.contains('open');
+    list.classList.toggle('open', open);
+    toggle.classList.toggle('open', open);
+  }
+
+  function renderInvoiceHistory() {
+    const list = getInvoiceHistory();
+    const countEl = document.getElementById('invHistoryCount');
+    countEl.textContent = list.length ? `(${list.length})` : '';
+    const container = document.getElementById('invHistoryList');
+    if (!list.length) {
+      container.innerHTML = '<div class="inv-history-empty">No invoices yet — the last 10 you generate will show up here, saved only on this device.</div>';
+      return;
+    }
+    container.innerHTML = list.map((inv, i) => `
+      <div class="inv-history-item">
+        <div class="inv-history-item-main">
+          <div class="inv-history-item-num">${inv.number} · ${inv.sym}${Number(inv.total).toFixed(2)}</div>
+          <div class="inv-history-item-sub">${inv.to || 'Client'} · ${inv.date || ''}</div>
+        </div>
+        <div class="inv-history-item-actions">
+          <button type="button" class="inv-history-btn" onclick="loadInvoiceFromHistory(${i})">Load</button>
+          <button type="button" class="inv-history-btn" onclick="deleteInvoiceHistoryItem(${i})">✕</button>
+        </div>
+      </div>
+    `).join('') + `<button type="button" class="inv-history-clear" onclick="clearInvoiceHistory()">Clear all history</button>`;
+  }
+
+  function loadInvoiceFromHistory(index) {
+    const inv = getInvoiceHistory()[index];
+    if (!inv) return;
+    document.getElementById('invFrom').value = inv.from || '';
+    document.getElementById('invFromDetails').value = inv.fromDetails || '';
+    document.getElementById('invTo').value = inv.to || '';
+    document.getElementById('invToDetails').value = inv.toDetails || '';
+    document.getElementById('invGstin').value = inv.gstin || '';
+    document.getElementById('invToGstin').value = inv.toGstin || '';
+    document.getElementById('invNumber').value = inv.number || '';
+    document.getElementById('invCurrency').value = inv.currency || 'USD';
+    document.getElementById('invDate').value = inv.date || '';
+    document.getElementById('invDueDate').value = inv.dueDate || '';
+    document.getElementById('invDiscount').value = inv.discountPct || '';
+    document.getElementById('invTax').value = inv.taxPct || '';
+    document.getElementById('invNotes').value = inv.notes || '';
+    document.getElementById('invUpi').value = inv.upi || '';
+    document.getElementById('invPayLink').value = inv.payLink || '';
+    if (inv.template) selectInvoiceTemplate(inv.template);
+
+    document.querySelectorAll('#invoiceRows .inv-item').forEach(r => r.remove());
+    invoiceRowCount = 0;
+    (inv.items && inv.items.length ? inv.items : [{}]).forEach(it => addInvoiceRow(it));
+    updateInvoiceTotal();
+    document.getElementById('invHistoryList').classList.remove('open');
+    document.getElementById('invHistoryToggle').classList.remove('open');
+  }
+
+  function deleteInvoiceHistoryItem(index) {
+    let list = getInvoiceHistory();
+    list.splice(index, 1);
+    try { localStorage.setItem(INV_HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
+    renderInvoiceHistory();
+  }
+
+  function clearInvoiceHistory() {
+    try { localStorage.removeItem(INV_HISTORY_KEY); } catch (e) {}
+    renderInvoiceHistory();
   }
 
   function updateInvoiceTotal() {
@@ -7851,27 +8069,72 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
     return lines;
   }
 
+  function invNormalizeUrl(u) {
+    u = (u || '').trim();
+    if (!u) return '';
+    if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    return u;
+  }
+
+  function addPdfLinkAnnotation(pdfDoc, page, rect, url) {
+    try {
+      const { PDFName, PDFString, PDFArray, PDFDict, PDFNumber } = window.PDFLib;
+      const context = pdfDoc.context;
+      const annotDict = context.obj({
+        Type: 'Annot',
+        Subtype: 'Link',
+        Rect: rect,
+        Border: [0, 0, 0],
+        C: [],
+        A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) },
+      });
+      const annotRef = context.register(annotDict);
+      const existing = page.node.lookup(PDFName.of('Annots'));
+      if (existing && existing.push) {
+        existing.push(annotRef);
+      } else {
+        page.node.set(PDFName.of('Annots'), context.obj([annotRef]));
+      }
+    } catch (e) { /* link annotation is a nice-to-have, never block PDF generation on it */ }
+  }
+
   async function downloadInvoice() {
     const btn = document.getElementById('invoiceBtn');
     const from = document.getElementById('invFrom').value.trim() || 'Your Name / Studio';
     const fromDetails = document.getElementById('invFromDetails').value.trim();
     const to = document.getElementById('invTo').value.trim() || 'Client Name';
     const toDetails = document.getElementById('invToDetails').value.trim();
+    const gstin = document.getElementById('invGstin').value.trim();
+    const toGstin = document.getElementById('invToGstin').value.trim();
     const number = document.getElementById('invNumber').value.trim() || 'INV-001';
     const date = document.getElementById('invDate').value || new Date().toISOString().slice(0, 10);
     const dueDate = document.getElementById('invDueDate').value;
     const notes = document.getElementById('invNotes').value.trim();
     const discountPct = parseFloat(document.getElementById('invDiscount').value) || 0;
     const taxPct = parseFloat(document.getElementById('invTax').value) || 0;
+    const upi = document.getElementById('invUpi').value.trim();
+    const payLink = document.getElementById('invPayLink').value.trim();
+    const currency = document.getElementById('invCurrency').value;
+    const template = invoiceTemplate;
     const { subtotal, discountAmt, taxAmt, total, sym } = updateInvoiceTotal();
 
+    const rawItems = [];
     const items = [];
     document.querySelectorAll('#invoiceRows .inv-item').forEach(row => {
       const desc = row.querySelector('.inv-item-desc').value.trim();
       const qty = parseFloat(row.querySelector('.inv-item-qty').value) || 0;
       const rate = parseFloat(row.querySelector('.inv-item-rate').value) || 0;
-      if (!desc && qty === 0 && rate === 0) return;
-      items.push([desc || '\u2014', String(qty), `${sym}${rate.toFixed(2)}`, `${sym}${(qty * rate).toFixed(2)}`]);
+      const hsnEl = row.querySelector('.inv-item-hsn');
+      const hsn = hsnEl ? hsnEl.value.trim() : '';
+      if (!desc && qty === 0 && rate === 0 && !hsn) return;
+      rawItems.push({ desc, qty, rate, hsn });
+      items.push({
+        desc: desc || '\u2014',
+        qtyStr: String(qty),
+        rateStr: `${sym}${rate.toFixed(2)}`,
+        amtStr: `${sym}${(qty * rate).toFixed(2)}`,
+        hsn
+      });
     });
 
     if (!items.length) {
@@ -7892,8 +8155,10 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       const { PDFDocument, rgb, StandardFonts } = window.PDFLib;
       const pdfDoc = await PDFDocument.create();
       const page = pdfDoc.addPage([595.28, 841.89]); // A4
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      const isClassic = template === 'classic';
+      const isBold = template === 'bold';
+      const font = await pdfDoc.embedFont(isClassic ? StandardFonts.TimesRoman : StandardFonts.Helvetica);
+      const fontBold = await pdfDoc.embedFont(isClassic ? StandardFonts.TimesRomanBold : StandardFonts.HelveticaBold);
       const { width: pageWidth, height: pageHeight } = page.getSize();
       const marginX = 48;
       const fromTop = (yTop) => pageHeight - yTop;
@@ -7901,11 +8166,22 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       const gray = rgb(0.35, 0.35, 0.35);
       const lightGray = rgb(0.6, 0.6, 0.6);
       const lineGray = rgb(0.88, 0.88, 0.86);
+      const white = rgb(1, 1, 1);
+      const offWhite = rgb(0.82, 0.83, 0.87);
+      const bandColor = rgb(0.09, 0.11, 0.17);
+      const accentColor = rgb(0.87, 0.29, 0.31); // coral accent, used sparingly on all templates
 
-      let y = 70;
+      if (isClassic) {
+        page.drawRectangle({
+          x: marginX - 16, y: 34,
+          width: pageWidth - (marginX - 16) * 2, height: pageHeight - 68,
+          borderColor: black, borderWidth: 1.2, color: undefined
+        });
+      }
+
+      // ---- pre-compute header content height (logo + from name + from details) ----
       let logoImg = null, logoDims = null;
       const logoDataUrl = window._ckInvoiceLogo;
-
       if (logoDataUrl) {
         try {
           const res = await fetch(logoDataUrl);
@@ -7917,38 +8193,62 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
           let w = maxW, h = (logoImg.height / logoImg.width) * maxW;
           if (h > maxH) { h = maxH; w = (logoImg.width / logoImg.height) * maxH; }
           logoDims = { w, h };
-          page.drawImage(logoImg, { x: marginX, y: fromTop(y - 4 + h), width: w, height: h });
-          y += h + 14;
         } catch (e) { /* bad/unsupported image data, skip logo */ }
       }
 
-      page.drawText(from, { x: marginX, y: fromTop(y), size: 13, font: fontBold, color: black });
-      const invoiceTitleW = fontBold.widthOfTextAtSize('INVOICE', 22);
-      page.drawText('INVOICE', { x: pageWidth - marginX - invoiceTitleW, y: fromTop(70 - 4), size: 22, font: fontBold, color: black });
-      const numberW = font.widthOfTextAtSize(number, 9.5);
-      page.drawText(number, { x: pageWidth - marginX - numberW, y: fromTop(70 + 12), size: 9.5, font, color: gray });
-
+      let y = 70;
+      if (logoDims) y += logoDims.h + 14;
       y += 18;
-      if (fromDetails) {
-        fromDetails.split('\n').forEach(line => {
-          page.drawText(line, { x: marginX, y: fromTop(y), size: 9, font, color: gray });
-          y += 12;
-        });
+      const fromDetailLines = fromDetails ? fromDetails.split('\n') : [];
+      const gstinLine = gstin ? [`GSTIN: ${gstin}`] : [];
+      const headerExtraLines = fromDetailLines.concat(gstinLine);
+      y += headerExtraLines.length * 12;
+      const headerBottom = Math.max(y, 90) + 8;
+
+      // ---- draw header background band for the bold template ----
+      if (isBold) {
+        page.drawRectangle({ x: 0, y: fromTop(headerBottom), width: pageWidth, height: headerBottom, color: bandColor });
+        page.drawRectangle({ x: 0, y: fromTop(headerBottom) - 4, width: pageWidth, height: 4, color: accentColor });
       }
 
-      const headerBottom = Math.max(y, 90) + 8;
-      page.drawLine({ start: { x: marginX, y: fromTop(headerBottom) }, end: { x: pageWidth - marginX, y: fromTop(headerBottom) }, thickness: 1.4, color: black });
+      const headerTextColor = isBold ? white : black;
+      const headerMutedColor = isBold ? offWhite : gray;
+      const headerLightColor = isBold ? offWhite : lightGray;
 
-      const by = headerBottom + 26;
+      let hy = 70;
+      if (logoDims) {
+        page.drawImage(logoImg, { x: marginX, y: fromTop(hy - 4 + logoDims.h), width: logoDims.w, height: logoDims.h });
+        hy += logoDims.h + 14;
+      }
+      page.drawText(from, { x: marginX, y: fromTop(hy), size: 13, font: fontBold, color: headerTextColor });
+      const invoiceTitleW = fontBold.widthOfTextAtSize('INVOICE', 22);
+      page.drawText('INVOICE', { x: pageWidth - marginX - invoiceTitleW, y: fromTop(70 - 4), size: 22, font: fontBold, color: headerTextColor });
+      const numberW = font.widthOfTextAtSize(number, 9.5);
+      page.drawText(number, { x: pageWidth - marginX - numberW, y: fromTop(70 + 12), size: 9.5, font, color: headerMutedColor });
+
+      hy += 18;
+      headerExtraLines.forEach(line => {
+        page.drawText(line, { x: marginX, y: fromTop(hy), size: 9, font, color: headerMutedColor });
+        hy += 12;
+      });
+
+      if (isClassic) {
+        page.drawLine({ start: { x: marginX, y: fromTop(headerBottom) }, end: { x: pageWidth - marginX, y: fromTop(headerBottom) }, thickness: 1.6, color: black });
+        page.drawLine({ start: { x: marginX, y: fromTop(headerBottom + 4) }, end: { x: pageWidth - marginX, y: fromTop(headerBottom + 4) }, thickness: 0.7, color: black });
+      } else if (!isBold) {
+        page.drawLine({ start: { x: marginX, y: fromTop(headerBottom) }, end: { x: pageWidth - marginX, y: fromTop(headerBottom) }, thickness: 1.4, color: black });
+      }
+
+      const separatorExtra = isClassic ? 6 : 0;
+      const by = headerBottom + 26 + separatorExtra;
       page.drawText('BILL TO', { x: marginX, y: fromTop(by), size: 8, font, color: lightGray });
       page.drawText(to, { x: marginX, y: fromTop(by + 14), size: 11, font: fontBold, color: black });
       let toY = by + 14;
-      if (toDetails) {
-        toDetails.split('\n').forEach(line => {
-          toY += 12;
-          page.drawText(line, { x: marginX, y: fromTop(toY), size: 9, font, color: gray });
-        });
-      }
+      const toExtraLines = (toDetails ? toDetails.split('\n') : []).concat(toGstin ? [`GSTIN: ${toGstin}`] : []);
+      toExtraLines.forEach(line => {
+        toY += 12;
+        page.drawText(line, { x: marginX, y: fromTop(toY), size: 9, font, color: gray });
+      });
 
       page.drawText('Issue date', { x: pageWidth - marginX - 130, y: fromTop(by), size: 9, font, color: lightGray });
       const dateW = fontBold.widthOfTextAtSize(date, 9);
@@ -7976,20 +8276,28 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       const amtHdrW = fontBold.widthOfTextAtSize('AMOUNT', 8.5);
       page.drawText('AMOUNT', { x: amtX + colAmtW - amtHdrW, y: fromTop(tableStartY), size: 8.5, font: fontBold, color: black });
       page.drawLine({ start: { x: marginX, y: fromTop(tableStartY + 6) }, end: { x: pageWidth - marginX, y: fromTop(tableStartY + 6) }, thickness: 1.2, color: black });
+      if (isClassic) {
+        page.drawLine({ start: { x: marginX, y: fromTop(tableStartY + 9) }, end: { x: pageWidth - marginX, y: fromTop(tableStartY + 9) }, thickness: 0.6, color: black });
+      }
 
-      let rowY = tableStartY + 24;
-      items.forEach(([desc, qty, rate, amt]) => {
-        const lines = invWrapText(desc, font, 9.5, descW - 10);
+      let rowY = tableStartY + (isClassic ? 27 : 24);
+      items.forEach(it => {
+        const lines = invWrapText(it.desc, font, 9.5, descW - 10);
         lines.forEach((line, i) => {
           page.drawText(line, { x: marginX, y: fromTop(rowY + i * 12), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
         });
-        const qtyW = font.widthOfTextAtSize(qty, 9.5);
-        page.drawText(qty, { x: qtyX + colQtyW / 2 - qtyW / 2, y: fromTop(rowY), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
-        const rateW = font.widthOfTextAtSize(rate, 9.5);
-        page.drawText(rate, { x: rateX + colRateW - rateW, y: fromTop(rowY), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
-        const amtW = fontBold.widthOfTextAtSize(amt, 9.5);
-        page.drawText(amt, { x: amtX + colAmtW - amtW, y: fromTop(rowY), size: 9.5, font: fontBold, color: rgb(0.12, 0.12, 0.12) });
-        const rowH = Math.max(lines.length * 12, 16);
+        let extraLine = 0;
+        if (it.hsn) {
+          page.drawText(`HSN/SAC: ${it.hsn}`, { x: marginX, y: fromTop(rowY + lines.length * 12), size: 7.5, font, color: lightGray });
+          extraLine = 1;
+        }
+        const qtyW = font.widthOfTextAtSize(it.qtyStr, 9.5);
+        page.drawText(it.qtyStr, { x: qtyX + colQtyW / 2 - qtyW / 2, y: fromTop(rowY), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
+        const rateW = font.widthOfTextAtSize(it.rateStr, 9.5);
+        page.drawText(it.rateStr, { x: rateX + colRateW - rateW, y: fromTop(rowY), size: 9.5, font, color: rgb(0.12, 0.12, 0.12) });
+        const amtW = fontBold.widthOfTextAtSize(it.amtStr, 9.5);
+        page.drawText(it.amtStr, { x: amtX + colAmtW - amtW, y: fromTop(rowY), size: 9.5, font: fontBold, color: rgb(0.12, 0.12, 0.12) });
+        const rowH = Math.max((lines.length + extraLine) * 12, 16);
         rowY += rowH + 8;
         page.drawLine({ start: { x: marginX, y: fromTop(rowY - 4) }, end: { x: pageWidth - marginX, y: fromTop(rowY - 4) }, thickness: 0.5, color: lineGray });
       });
@@ -8012,9 +8320,21 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
       if (discountPct > 0) summaryLine(`Discount (${discountPct}%)`, `-${sym}${discountAmt.toFixed(2)}`, false);
       if (taxPct > 0) summaryLine(`Tax (${taxPct}%)`, `${sym}${taxAmt.toFixed(2)}`, false);
       sy += 4;
-      page.drawLine({ start: { x: sumX1, y: fromTop(sy) }, end: { x: sumX2, y: fromTop(sy) }, thickness: 1, color: black });
-      sy += 16;
-      summaryLine('Total', `${sym}${total.toFixed(2)}`, true);
+      if (isBold) {
+        page.drawRectangle({ x: sumX1 - 8, y: fromTop(sy + 20), width: (sumX2 - sumX1) + 8, height: 22, color: bandColor });
+        page.drawLine({ start: { x: sumX1, y: fromTop(sy) }, end: { x: sumX2, y: fromTop(sy) }, thickness: 1, color: lineGray });
+        sy += 16;
+        const f = fontBold, size = 11.5;
+        page.drawText('Total', { x: sumX1, y: fromTop(sy), size, font: f, color: white });
+        const totalStr = `${sym}${total.toFixed(2)}`;
+        const w = f.widthOfTextAtSize(totalStr, size);
+        page.drawText(totalStr, { x: sumX2 - w, y: fromTop(sy), size, font: f, color: white });
+        sy += 18;
+      } else {
+        page.drawLine({ start: { x: sumX1, y: fromTop(sy) }, end: { x: sumX2, y: fromTop(sy) }, thickness: 1, color: black });
+        sy += 16;
+        summaryLine('Total', `${sym}${total.toFixed(2)}`, true);
+      }
 
       if (notes) {
         sy += 20;
@@ -8024,6 +8344,53 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
         noteLines.forEach((line, i) => {
           page.drawText(line, { x: marginX, y: fromTop(sy + i * 12), size: 9, font, color: gray });
         });
+        sy += noteLines.length * 12;
+      }
+
+      // ---- Pay Now: UPI deep link and/or a pasted payment link, with a clickable button + QR ----
+      const upiLink = upi ? `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(from)}&am=${total.toFixed(2)}&cu=INR&tn=${encodeURIComponent(number)}` : '';
+      const payUrl = payLink ? invNormalizeUrl(payLink) : upiLink;
+      if (payUrl) {
+        sy += 22;
+        const boxTop = sy;
+        const boxH = 76;
+        page.drawRectangle({
+          x: marginX, y: fromTop(boxTop + boxH), width: pageWidth - marginX * 2, height: boxH,
+          color: rgb(0.96, 0.97, 0.95), borderColor: lineGray, borderWidth: 1
+        });
+
+        let qrImg = null;
+        try {
+          const qrData = encodeURIComponent(payUrl);
+          const qrRes = await fetch(`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${qrData}`);
+          const qrBytes = await qrRes.arrayBuffer();
+          qrImg = await pdfDoc.embedPng(qrBytes);
+        } catch (e) { /* offline or blocked \u2014 the button + printed link still work */ }
+
+        const qrSize = 56;
+        if (qrImg) {
+          page.drawImage(qrImg, { x: marginX + 14, y: fromTop(boxTop + 14 + qrSize), width: qrSize, height: qrSize });
+        }
+        const textX = marginX + (qrImg ? 14 + qrSize + 16 : 16);
+
+        const btnW = 118, btnH = 26;
+        const btnX = textX, btnY = boxTop + 14;
+        page.drawRectangle({ x: btnX, y: fromTop(btnY + btnH), width: btnW, height: btnH, color: accentColor });
+        const payLabel = 'PAY NOW  \u2197';
+        const payLabelW = fontBold.widthOfTextAtSize(payLabel, 10);
+        page.drawText(payLabel, { x: btnX + btnW / 2 - payLabelW / 2, y: fromTop(btnY + btnH - 8), size: 10, font: fontBold, color: white });
+        addPdfLinkAnnotation(pdfDoc, page, [btnX, fromTop(btnY + btnH), btnX + btnW, fromTop(btnY)], payUrl);
+        if (qrImg) addPdfLinkAnnotation(pdfDoc, page, [marginX + 14, fromTop(boxTop + 14 + qrSize), marginX + 14 + qrSize, fromTop(boxTop + 14)], payUrl);
+
+        const methodLabel = payLink ? 'Scan the QR or tap to pay' : `Scan to pay via UPI \u2014 ${upi}`;
+        page.drawText(methodLabel, { x: textX, y: fromTop(btnY + btnH + 10), size: 8.5, font, color: gray });
+
+        const linkLines = invWrapText(payUrl, font, 7.5, pageWidth - marginX * 2 - (textX - marginX));
+        linkLines.slice(0, 2).forEach((line, i) => {
+          page.drawText(line, { x: textX, y: fromTop(btnY + btnH + 22 + i * 10), size: 7.5, font, color: lightGray });
+        });
+
+        sy = boxTop + boxH;
       }
 
       const footerText = 'Generated with CreatorKit \u2014 creatorkitapp.vercel.app';
@@ -8043,10 +8410,18 @@ Return ONLY this structure with the labels exactly as given, nothing else.`
 
       try {
         localStorage.setItem('ck_invoice_profile', JSON.stringify({
-          from, fromDetails, currency: document.getElementById('invCurrency').value, logo: logoDataUrl || null
+          from, fromDetails, gstin, upi, payLink, currency, template, logo: logoDataUrl || null
         }));
         const seq = parseInt(localStorage.getItem('ck_invoice_seq') || '0', 10) + 1;
         localStorage.setItem('ck_invoice_seq', String(seq));
+
+        saveInvoiceToHistory({
+          number, from, fromDetails, to, toDetails, gstin, toGstin,
+          date, dueDate, currency, sym, template,
+          discountPct, taxPct, notes, upi, payLink,
+          items: rawItems, total
+        });
+        renderInvoiceHistory();
       } catch (e) {}
     } catch (err) {
       console.error('Invoice PDF generation failed:', err);
