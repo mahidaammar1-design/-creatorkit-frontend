@@ -1,13 +1,14 @@
 /* ============================================================
-   CreatorKit Upgrades — analytics, deep links, UX & a11y fixes
-   Add to index.html just before </body>:
-   <script defer src="/ck-upgrades.js"></script>
+   CreatorKit Upgrades v2 — analytics, deep links, UX, perf
+   index.html me </body> se pehle: <script defer src="/ck-upgrades.js"></script>
+   v2 ke saath: index.html ke <head> se Razorpay wali line DELETE karo:
+   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+   (ye file usko page-load ke baad khud load kar legi — payment same rahega)
    ============================================================ */
 (function () {
   'use strict';
 
-  /* ---------- 1. VERCEL ANALYTICS (pageviews) ----------
-     Enable in Vercel dashboard: Project → Analytics → Enable */
+  /* ---------- 1. VERCEL ANALYTICS (pageviews) ---------- */
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   var s = document.createElement('script');
   s.defer = true;
@@ -18,8 +19,65 @@
     try { window.va('event', { name: name, data: data || {} }); } catch (e) {}
   }
 
-  /* ---------- 2. FUNNEL EVENTS ---------- */
-  // paywall_seen — user scrolled to pricing
+  /* ---------- 2. RAZORPAY LAZY-LOAD (perf) ----------
+     Head se hata ke page load ke BAAD load karte hain —
+     pehli visit fast hogi, payment bilkul same kaam karega. */
+  function loadRazorpay() {
+    if (window.Razorpay || document.getElementById('ckRzpScript')) return;
+    var r = document.createElement('script');
+    r.id = 'ckRzpScript';
+    r.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    document.head.appendChild(r);
+  }
+  if (document.readyState === 'complete') {
+    setTimeout(loadRazorpay, 1200);
+  } else {
+    window.addEventListener('load', function () { setTimeout(loadRazorpay, 1200); });
+  }
+  // Safety net: agar user turant unlock pe click kare to usi waqt load ho jaye
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('.price-cta, #navCtaBtn')) loadRazorpay();
+  }, true);
+
+  /* ---------- 3. UNIVERSAL CSS TRANSITION FIX (perf) ----------
+     `*, *::before, *::after { transition: ... }` wali rule puri site ko
+     scroll/hover pe slow karti hai. Usse hata ke sirf theme-switch ke
+     waqt 400ms ke liye lagate hain — theme toggle smooth hi rahega. */
+  try {
+    outer:
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var sheet = document.styleSheets[i];
+      var rules;
+      try { rules = sheet.cssRules; } catch (err) { continue; } // cross-origin skip
+      if (!rules) continue;
+      for (var j = 0; j < rules.length; j++) {
+        var rule = rules[j];
+        if (rule.selectorText &&
+            rule.selectorText.indexOf('*') === 0 &&
+            rule.selectorText.indexOf('::before') !== -1 &&
+            rule.style && rule.style.transition) {
+          sheet.deleteRule(j);
+          break outer;
+        }
+      }
+    }
+    var themeCss = document.createElement('style');
+    themeCss.textContent =
+      '.ck-theme-anim, .ck-theme-anim *, .ck-theme-anim *::before, .ck-theme-anim *::after{' +
+      'transition: background-color .25s ease, border-color .25s ease, color .2s ease !important;}';
+    document.head.appendChild(themeCss);
+    var themeBtn = document.getElementById('themeToggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', function () {
+        document.documentElement.classList.add('ck-theme-anim');
+        setTimeout(function () {
+          document.documentElement.classList.remove('ck-theme-anim');
+        }, 450);
+      }, true);
+    }
+  } catch (e) {}
+
+  /* ---------- 4. FUNNEL EVENTS ---------- */
   var pricing = document.getElementById('pricing');
   if (pricing && 'IntersectionObserver' in window) {
     var seen = false;
@@ -30,8 +88,6 @@
       }
     }, { threshold: 0.3 }).observe(pricing);
   }
-
-  // checkout_opened — any "$5" unlock CTA clicked
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('.price-cta, #navCtaBtn');
     if (btn && /\$5|unlock/i.test(btn.textContent)) track('checkout_opened');
@@ -41,13 +97,10 @@
       track('tool_opened', { tool: title ? title.textContent.trim() : 'unknown' });
     }
   }, true);
-
-  // demo_used — free caption demo generated
   var genBtn = document.getElementById('generateBtn');
   if (genBtn) genBtn.addEventListener('click', function () { track('demo_used'); });
 
-  /* ---------- 3. ?tool= DEEP LINKS (used by the SEO tool pages) ----------
-     /?tool=qr | invoice | image | screenshot | caption  */
+  /* ---------- 5. ?tool= DEEP LINKS (SEO pages ke buttons) ---------- */
   var TOOL_OPENERS = {
     qr: 'openQrModal',
     invoice: 'openInvoiceModal',
@@ -72,7 +125,7 @@
     setTimeout(openFromParam, 300);
   }
 
-  /* ---------- 4. ESCAPE KEY CLOSES MODALS (a11y) ---------- */
+  /* ---------- 6. ESCAPE SE MODAL CLOSE (a11y) ---------- */
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
     document.querySelectorAll('.modal-overlay.active').forEach(function (m) {
@@ -80,7 +133,7 @@
     });
   });
 
-  /* ---------- 5. PREFERS-REDUCED-MOTION (perf + a11y) ---------- */
+  /* ---------- 7. PREFERS-REDUCED-MOTION (perf + a11y) ---------- */
   var css = document.createElement('style');
   css.textContent =
     '@media (prefers-reduced-motion: reduce){' +
@@ -89,14 +142,12 @@
     '#cursorGlow,#heroParticles{display:none!important}' +
     '}';
   document.head.appendChild(css);
-
-  // Also hide the custom cursor glow on touch devices (it's pointless there)
   if (window.matchMedia('(hover: none)').matches) {
     var glow = document.getElementById('cursorGlow');
     if (glow) glow.style.display = 'none';
   }
 
-  /* ---------- 6. INR PRICE HINT FOR INDIAN VISITORS ---------- */
+  /* ---------- 8. INR PRICE HINT (India visitors) ---------- */
   try {
     var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
     if (tz === 'Asia/Kolkata' || tz === 'Asia/Calcutta') {
